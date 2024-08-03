@@ -25,7 +25,6 @@
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
-    "@biomejs/biome": "1.5.3",
     "typescript": "catalog:"
   }
 }
