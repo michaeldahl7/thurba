@@ -4,15 +4,17 @@ import { z } from "zod";
 import { desc, eq } from "@acme/db";
 import { CreatePostSchema, Post } from "@acme/db/schema";
 
-import {  publicProcedure } from "../trpc"; //protectedProcedure,
+import { publicProcedure } from "../trpc"; //protectedProcedure,
 
 export const helloRouter = {
   hello: publicProcedure.query(({ ctx }) => {
     return "hello";
-	}),
-	get: publicProcedure.input(z.object({ id: z.string() })).query(({ ctx, input }) => {
-		return (`hello ${input.id}`);
-	}),
+  }),
+  get: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(({ ctx, input }) => {
+      return `hello ${input.id}`;
+    }),
 } satisfies TRPCRouterRecord;
 
 // export const postRouter = {

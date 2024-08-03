@@ -4,9 +4,9 @@ import { helloRouter } from "./router/hello";
 import { createTRPCRouter } from "./trpc";
 
 export const appRouter = createTRPCRouter({
-	helloRouter
-//   auth: authRouter,
-//   post: postRouter,
+  helloRouter,
+  //   auth: authRouter,
+  //   post: postRouter,
 });
 
 // export type definition of API
