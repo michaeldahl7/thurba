@@ -10,6 +10,7 @@
     "hono": "^4.5.3"
   },
   "devDependencies": {
+    "@acme/tsconfig": "workspace:*",
     "@types/node": "^20.11.17",
     "tsx": "^4.7.1",
     "typescript": "catalog:"

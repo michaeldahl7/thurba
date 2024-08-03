@@ -49,6 +49,7 @@ export const createTRPCContext = async (opts: {
 
   return {
     // session,
+    headers: opts.headers,
     db,
     token: authToken,
   };
