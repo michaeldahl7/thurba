@@ -36,11 +36,6 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
       },
       {
         type: "add",
-        path: "packages/{{ name }}/eslint.config.js",
-        templateFile: "templates/eslint.config.js.hbs",
-      },
-      {
-        type: "add",
         path: "packages/{{ name }}/package.json",
         templateFile: "templates/package.json.hbs",
       },
@@ -76,16 +71,10 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
       },
       async (answers) => {
         /**
-         * Install deps and format everything
+         * Install deps
          */
         if ("name" in answers && typeof answers.name === "string") {
-          // execSync("pnpm dlx sherif@latest --fix", {
-          //   stdio: "inherit",
-          // });
           execSync("pnpm i", { stdio: "inherit" });
-          execSync(
-            `pnpm prettier --write packages/${answers.name}/** --list-different`,
-          );
           return "Package scaffolded";
         }
         return "Package not scaffolded";

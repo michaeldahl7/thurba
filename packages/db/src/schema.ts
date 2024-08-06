@@ -8,10 +8,11 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const Post = pgTable("post", {
+export const PostTable = pgTable("post", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   title: varchar("name", { length: 256 }).notNull(),
   content: text("content").notNull(),
@@ -22,7 +23,7 @@ export const Post = pgTable("post", {
   }).$onUpdateFn(() => sql`now()`),
 });
 
-export const CreatePostSchema = createInsertSchema(Post, {
+export const CreatePostSchema = createInsertSchema(PostTable, {
   title: z.string().max(256),
   content: z.string().max(256),
 }).omit({
@@ -31,27 +32,30 @@ export const CreatePostSchema = createInsertSchema(Post, {
   updatedAt: true,
 });
 
-export const User = pgTable("user", {
+export const UserTable = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).unique(),
   emailVerified: timestamp("emailVerified", {
     mode: "date",
     withTimezone: true,
   }),
+  password_hash: varchar("password_hash", { length: 255 }),
+  username: varchar("username", { length: 255 }),
+  github_id: integer("github_id").unique(),
   image: varchar("image", { length: 255 }),
 });
 
-export const UserRelations = relations(User, ({ many }) => ({
-  accounts: many(Account),
+export const UserRelations = relations(UserTable, ({ many }) => ({
+  accounts: many(AccountTable),
 }));
 
-export const Account = pgTable(
+export const AccountTable = pgTable(
   "account",
   {
     userId: uuid("userId")
       .notNull()
-      .references(() => User.id, { onDelete: "cascade" }),
+      .references(() => UserTable.id, { onDelete: "cascade" }),
     type: varchar("type", { length: 255 })
       .$type<"email" | "oauth" | "oidc" | "webauthn">()
       .notNull(),
@@ -72,21 +76,38 @@ export const Account = pgTable(
   }),
 );
 
-export const AccountRelations = relations(Account, ({ one }) => ({
-  user: one(User, { fields: [Account.userId], references: [User.id] }),
+export const AccountRelations = relations(AccountTable, ({ one }) => ({
+  user: one(UserTable, {
+    fields: [AccountTable.userId],
+    references: [UserTable.id],
+  }),
 }));
 
-export const Session = pgTable("session", {
-  sessionToken: varchar("sessionToken", { length: 255 }).notNull().primaryKey(),
+// export const Session = pgTable("session", {
+//   sessionToken: varchar("sessionToken", { length: 255 }).notNull().primaryKey(),
+//   userId: uuid("userId")
+//     .notNull()
+//     .references(() => User.id, { onDelete: "cascade" }),
+//   expiresAt: timestamp("expires", {
+//     mode: "date",
+//     withTimezone: true,
+//   }).notNull(),
+// });
+
+export const SessionTable = pgTable("session", {
+  id: text("id").primaryKey(),
   userId: uuid("userId")
     .notNull()
-    .references(() => User.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", {
-    mode: "date",
+    .references(() => UserTable.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at", {
     withTimezone: true,
+    mode: "date",
   }).notNull(),
 });
 
-export const SessionRelations = relations(Session, ({ one }) => ({
-  user: one(User, { fields: [Session.userId], references: [User.id] }),
+export const SessionRelations = relations(SessionTable, ({ one }) => ({
+  user: one(UserTable, {
+    fields: [SessionTable.userId],
+    references: [UserTable.id],
+  }),
 }));

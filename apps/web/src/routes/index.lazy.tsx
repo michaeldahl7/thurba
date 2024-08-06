@@ -7,6 +7,7 @@ export const Route = createLazyFileRoute("/")({
 
 function Index() {
   const { data } = api.hello.get.useQuery({ id: "world" });
+
   return (
     <div className="p-2">
       <h3>Welcome Home! {data}</h3>

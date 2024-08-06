@@ -1,5 +1,5 @@
 {
-  "name": "@acme/{{ name }}",
+  "name": "@acme/auth",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -13,9 +13,13 @@
     "dev": "tsc",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@acme/db": "workspace:*",
+    "lucia": "^3.2.0",
+    "@lucia-auth/adapter-drizzle": "^1.0.7"
+  },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
-
     "typescript": "catalog:"
   }
 }

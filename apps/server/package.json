@@ -1,7 +1,8 @@
 {
   "name": "@acme/server",
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "dev": "pnpm with-env tsx watch src/index.ts",
+    "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
     "@acme/api": "workspace:*",
@@ -11,6 +12,7 @@
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
+    "dotenv-cli": "^7.4.2",
     "@types/node": "^20.11.17",
     "tsx": "^4.7.1",
     "typescript": "catalog:"
