@@ -2,7 +2,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
 import { desc, eq } from "@acme/db";
-import { CreatePostSchema, PostTable, UserTable } from "@acme/db/schema";
+import { UserTable } from "@acme/db/schema";
 import { hash } from "@node-rs/argon2";
 import { publicProcedure } from "../trpc"; //protectedProcedure,
 

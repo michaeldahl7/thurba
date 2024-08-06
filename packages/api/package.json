@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@acme/db": "workspace:*",
+    "@acme/auth": "workspace:*",
     "@acme/validators": "workspace:*",
     "@trpc/server": "catalog:",
     "superjson": "2.2.1",
