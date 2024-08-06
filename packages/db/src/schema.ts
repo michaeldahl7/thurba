@@ -2,37 +2,40 @@ import { relations, sql } from "drizzle-orm";
 import {
   integer,
   pgTable,
+  pgTableCreator,
+  index,
   primaryKey,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const PostTable = pgTable("post", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
-  title: varchar("name", { length: 256 }).notNull(),
-  content: text("content").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt", {
-    mode: "date",
-    withTimezone: true,
-  }).$onUpdateFn(() => sql`now()`),
-});
+export const createTable = pgTableCreator((name) => `thurba_${name}`);
 
-export const CreatePostSchema = createInsertSchema(PostTable, {
-  title: z.string().max(256),
-  content: z.string().max(256),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+// export const PostTable = pgTable("post", {
+//   id: uuid("id").notNull().primaryKey().defaultRandom(),
+//   title: varchar("name", { length: 256 }).notNull(),
+//   content: text("content").notNull(),
+//   createdAt: timestamp("created_at").defaultNow().notNull(),
+//   updatedAt: timestamp("updatedAt", {
+//     mode: "date",
+//     withTimezone: true,
+//   }).$onUpdateFn(() => sql`now()`),
+// });
 
-export const UserTable = pgTable("user", {
+// export const CreatePostSchema = createInsertSchema(PostTable, {
+//   title: z.string().max(256),
+//   content: z.string().max(256),
+// }).omit({
+//   id: true,
+//   createdAt: true,
+//   updatedAt: true,
+// });
+
+export const UserTable = createTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).unique(),
@@ -41,7 +44,7 @@ export const UserTable = pgTable("user", {
     withTimezone: true,
   }),
   password_hash: varchar("password_hash", { length: 255 }),
-  username: varchar("username", { length: 255 }),
+  username: varchar("username", { length: 255 }).unique(),
   github_id: integer("github_id").unique(),
   image: varchar("image", { length: 255 }),
 });
@@ -50,7 +53,7 @@ export const UserRelations = relations(UserTable, ({ many }) => ({
   accounts: many(AccountTable),
 }));
 
-export const AccountTable = pgTable(
+export const AccountTable = createTable(
   "account",
   {
     userId: uuid("userId")
@@ -94,7 +97,7 @@ export const AccountRelations = relations(AccountTable, ({ one }) => ({
 //   }).notNull(),
 // });
 
-export const SessionTable = pgTable("session", {
+export const SessionTable = createTable("session", {
   id: text("id").primaryKey(),
   userId: uuid("userId")
     .notNull()

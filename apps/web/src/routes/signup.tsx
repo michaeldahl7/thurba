@@ -39,7 +39,6 @@ function FieldInfo({ field }: { field: FieldApi<any, any, any, any> }) {
 
 export default function Signup() {
   const mutation = api.hello.signup.useMutation();
-  const query = api.hello.get.useQuery({ id: "world" });
   const form = useForm({
     defaultValues: {
       username: "",
@@ -47,9 +46,6 @@ export default function Signup() {
       confirm_password: "",
     },
     onSubmit: async ({ value }) => {
-      console.log(query.data);
-      //   console.log(value);
-      // Do something with form dat
       mutation.mutate({
         username: value.username,
         password: value.password,
@@ -81,7 +77,7 @@ export default function Signup() {
               // Avoid hasty abstractions. Render props are great!
               return (
                 <>
-                  <label htmlFor={field.name}>First Name:</label>
+                  <label htmlFor={field.name}>Username:</label>
                   <input
                     id={field.name}
                     name={field.name}
@@ -117,6 +113,9 @@ export default function Signup() {
               </>
             )}
           />
+          {mutation.error && (
+            <p>Something went wrong! {mutation.error.message}</p>
+          )}
         </div>
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}

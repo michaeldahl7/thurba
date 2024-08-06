@@ -23,6 +23,8 @@
     "dev": "tsc",
     "clean": "rm -rf .turbo dist node_modules",
     "push": "pnpm with-env drizzle-kit push",
+    "db:gen": "pnpm with-env drizzle-kit generate",
+    "db:migrate": "pnpm with-env drizzle-kit migrate",
     "studio": "pnpm with-env drizzle-kit studio",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "with-env": "dotenv -e ../../.env --"
