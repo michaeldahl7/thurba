@@ -1,9 +1,21 @@
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
-import { TRPCProvider } from "./utils/api";
+// import { TRPCProvider } from "./utils/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// import { queryClient } from "./utils/queryClient";
 // Create a new router instance
-const router = createRouter({ routeTree });
+export const queryClient = new QueryClient();
+
+const router = createRouter({
+  routeTree,
+  defaultPreload: "intent",
+  context: {
+    // auth: undefined!, // We'll inject this when we render
+    queryClient,
+  },
+  defaultPreloadStaleTime: 0,
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
@@ -14,10 +26,11 @@ declare module "@tanstack/react-router" {
 
 function App() {
   return (
-    <TRPCProvider>
+    <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-    </TRPCProvider>
+    </QueryClientProvider>
   );
 }
 
+// <TRPCProvider>
 export default App;

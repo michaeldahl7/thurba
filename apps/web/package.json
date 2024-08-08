@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@acme/ui": "workspace:*",
+    "@acme/rpc": "workspace:*",
     "@tanstack/react-form": "^0.27.0",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-devtools": "^5.51.21",

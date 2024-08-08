@@ -114,3 +114,12 @@ export const SessionRelations = relations(SessionTable, ({ one }) => ({
     references: [UserTable.id],
   }),
 }));
+
+// export const CreatePostSchema = createInsertSchema(Post, {
+// 	title: z.string().max(256),
+// 	content: z.string().max(256),
+//   }).omit({
+// 	id: true,
+// 	createdAt: true,
+// 	updatedAt: true,
+//   });

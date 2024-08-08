@@ -38,7 +38,6 @@
 //     <api.Provider client={trpcClient} queryClient={queryClient}>
 //       <QueryClientProvider client={queryClient}>
 //         {props.children}
-//         <ReactQueryDevtools initialIsOpen={false} />
 //       </QueryClientProvider>
 //     </api.Provider>
 //   );
