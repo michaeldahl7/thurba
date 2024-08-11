@@ -1,6 +1,4 @@
-import { Link } from "@tanstack/react-router";
-
-const link = <Link to="/about">About</Link>;
+// import { Link } from "@tanstack/react-router";
 
 import { createFileRoute } from "@tanstack/react-router";
 

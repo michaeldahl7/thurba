@@ -4,7 +4,7 @@ import { generateState } from "arctic";
 import { github } from "@acme/auth";
 import { serializeCookie } from "oslo/cookie";
 import { desc, eq } from "@acme/db";
-import { UserTable } from "@acme/db/schema";
+import { users } from "@acme/db/schema";
 import { hash } from "@node-rs/argon2";
 import { publicProcedure } from "../trpc"; //protectedProcedure,
 

@@ -1,16 +1,14 @@
-import type { Config } from "drizzle-kit";
+import { env } from "./src/env";
+import { defineConfig } from "drizzle-kit";
 
-if (!process.env.POSTGRES_URL) {
-  throw new Error("Missing POSTGRES_URL");
-}
-
-console.log("dburl in config: ", process.env.POSTGRES_URL);
-
-const nonPoolingUrl = process.env.POSTGRES_URL.replace(":6543", ":5432");
-
-export default {
+export default defineConfig({
   schema: "./src/schema.ts",
   dialect: "postgresql",
-  dbCredentials: { url: nonPoolingUrl },
+  out: "./drizzle",
+  dbCredentials: {
+    url: env.DATABASE_URL,
+  },
   tablesFilter: ["thurba_*"],
-} satisfies Config;
+  verbose: true,
+  strict: true,
+});

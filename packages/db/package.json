@@ -25,7 +25,10 @@
     "push": "pnpm with-env drizzle-kit push",
     "db:gen": "pnpm with-env drizzle-kit generate",
     "db:migrate": "pnpm with-env drizzle-kit migrate",
-    "studio": "pnpm with-env drizzle-kit studio",
+    "db:clear": "tsx ./src/db/clear.ts",
+    "db:seed": "tsx ./src/db/seed.ts",
+    "db:reset": "npm run db:clear && npm run db:migrate && npm run db:seed",
+    "db:studio": "pnpm with-env drizzle-kit studio",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "with-env": "dotenv -e ../../.env --"
   },
@@ -38,6 +41,7 @@
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
+    "tsx": "^4.16.2",
     "dotenv-cli": "^7.4.2",
     "drizzle-kit": "^0.22.8",
     "typescript": "catalog:"

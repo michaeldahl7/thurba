@@ -3,15 +3,18 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 // import { TRPCProvider } from "./utils/api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthClient } from "./auth/AuthClient";
+
 // import { queryClient } from "./utils/queryClient";
 // Create a new router instance
 export const queryClient = new QueryClient();
+const authClient = new AuthClient();
 
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   context: {
-    // auth: undefined!, // We'll inject this when we render
+    authClient,
     queryClient,
   },
   defaultPreloadStaleTime: 0,

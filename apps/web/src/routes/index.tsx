@@ -1,17 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 // import { api } from "../utils/api";
-import { useGetUsers } from "../utils/use-get-users";
+// import { useGetUsers } from "../utils/use-get-users";
 
 export const Route = createFileRoute("/")({
   component: Page,
 });
 
 export function Page() {
-  const { data: users, isLoading } = useGetUsers();
+  //   const { data: users, isLoading } = useGetUsers();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  //   if (isLoading) {
+  //     return <div>Loading...</div>;
+  //   }
   // This can either be a tuple ['login'] or string 'login'
 
   return (

@@ -15,7 +15,7 @@
     "tsBuildInfoFile": "${configDir}/node_modules/.cache/tsbuildinfo.json",
 
     "strict": true,
-    "noUncheckedIndexedAccess": true,
+
     "checkJs": true,
 
     "module": "Preserve",

@@ -242,28 +242,43 @@ importers:
       drizzle-kit:
         specifier: ^0.22.8
         version: 0.22.8
+      tsx:
+        specifier: ^4.16.2
+        version: 4.16.5
       typescript:
         specifier: 'catalog:'
         version: 5.5.4
 
   packages/rpc:
     dependencies:
+      '@acme/auth':
+        specifier: workspace:*
+        version: link:../auth
       '@acme/db':
         specifier: workspace:*
         version: link:../db
-      '@hono/node-server':
-        specifier: ^1.12.0
-        version: 1.12.0
       '@hono/zod-validator':
         specifier: ^0.2.2
         version: 0.2.2(hono@4.5.3)(zod@3.23.8)
+      '@lucia-auth/adapter-drizzle':
+        specifier: ^1.0.7
+        version: 1.0.7(lucia@3.2.0)
+      arctic:
+        specifier: ^1.9.2
+        version: 1.9.2
       hono:
         specifier: ^4.5.3
         version: 4.5.3
+      lucia:
+        specifier: ^3.2.0
+        version: 3.2.0
     devDependencies:
       '@acme/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/typescript
+      '@types/node':
+        specifier: ^20.10.5
+        version: 20.14.14
       typescript:
         specifier: 'catalog:'
         version: 5.5.4

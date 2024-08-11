@@ -1,14 +1,15 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+// import { useAuth } from "../hooks/UseAuth";
 
-import { z } from "zod";
+function Login() {
+  //   const { signIn } = useAuth();
 
-export const Route = createFileRoute("/login")({
-  validateSearch: z.object({
-    redirect: z.string().optional(),
-  }),
-  component: LoginComponent,
-});
-
-function LoginComponent() {
-  return <div>Loginsz</div>;
+  return (
+    <div>
+      <h1>Login</h1>
+      {/* <button onClick={() => signIn("github")}>Login with GitHub</button>
+      <button onClick={() => signIn("google")}>Login with Google</button> */}
+    </div>
+  );
 }
+
+export default Login;
