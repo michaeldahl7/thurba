@@ -1,7 +1,13 @@
 // import { useRouter } from "@tanstack/react-router";
 // import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-// export function useAuth() {
+// import { client } from "@acme/rpc";
+
+// import { database } from "@acme/db/client";
+
+export function useAuth() {
+  // client.api.login.github.
+}
 //   const { authClient } = useRouter().context;
 //   const queryClient = useQueryClient();
 

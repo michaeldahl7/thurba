@@ -5,7 +5,7 @@ import type { UserId } from "lucia";
 export const getCurrentUser = async (sessionId: string | null) => {
   const session = await validateRequest(sessionId);
   if (!session.user) {
-    return undefined;
+    return null;
   }
   return session.user;
 };

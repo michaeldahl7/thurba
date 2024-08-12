@@ -1,15 +1,5 @@
-// import { useAuth } from "../hooks/UseAuth";
+import { createFileRoute } from "@tanstack/react-router";
 
-function Login() {
-  //   const { signIn } = useAuth();
-
-  return (
-    <div>
-      <h1>Login</h1>
-      {/* <button onClick={() => signIn("github")}>Login with GitHub</button>
-      <button onClick={() => signIn("google")}>Login with Google</button> */}
-    </div>
-  );
-}
-
-export default Login;
+export const Route = createFileRoute("/login")({
+  component: () => <div>Login page </div>,
+});

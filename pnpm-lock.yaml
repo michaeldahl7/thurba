@@ -91,6 +91,12 @@ importers:
 
   apps/web:
     dependencies:
+      '@acme/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@acme/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@acme/rpc':
         specifier: workspace:*
         version: link:../../packages/rpc

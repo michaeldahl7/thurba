@@ -3,17 +3,21 @@ import {
   createRootRouteWithContext,
   Link,
   Outlet,
+  useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import type { QueryClient } from "@tanstack/react-query";
-import type { AuthClient } from "../auth/AuthClient";
+// import type { AuthClient } from "../auth/AuthClient";
+import { Spinner } from "../components/Spinner";
 
-interface MyRouterContext {
-  queryClient: QueryClient;
-  authClient: AuthClient;
+function RouterSpinner() {
+  const isLoading = useRouterState({ select: (s) => s.status === "idle" });
+  return <Spinner show={isLoading} />;
 }
 
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   component: RootComponent,
 });
 
@@ -26,11 +30,11 @@ function RootComponent() {
         <Link to="/" className="[&.active]:font-bold">
           Home
         </Link>{" "}
-        <Link to="/about" className="[&.active]:font-bold">
-          About
-        </Link>
       </div>
       <hr />
+      <div className={"text-3xl"}>
+        <RouterSpinner />
+      </div>
       <Outlet />
       <ReactQueryDevtools buttonPosition="top-right" />
       <TanStackRouterDevtools position="bottom-right" />
