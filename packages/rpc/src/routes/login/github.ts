@@ -1,12 +1,12 @@
-import { Hono } from "hono";
-import { getCookie, setCookie } from "hono/cookie";
 import { github } from "@acme/auth"; //validateRequest,
 import { setSession } from "@acme/auth/sessions";
+import { Hono } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
 
 import { getAccountByGithubId } from "../../data-access/accounts";
 
+import { OAuth2RequestError, generateState } from "arctic";
 import type { Context } from "../../lib/context";
-import { generateState, OAuth2RequestError } from "arctic";
 import { createGithubUserUseCase } from "../../use-cases/users";
 
 export interface GitHubUser {

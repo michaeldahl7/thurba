@@ -1,6 +1,6 @@
+import { lucia } from "@acme/auth"; //validateRequest,
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
-import { lucia } from "@acme/auth"; //validateRequest,
 
 import type { Context } from "../../lib/context";
 

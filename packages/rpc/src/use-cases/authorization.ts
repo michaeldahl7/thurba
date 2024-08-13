@@ -1,8 +1,8 @@
-import { AuthenticationError, NotFoundError } from "../use-cases/errors";
+import type { Group, GroupId } from "@acme/db/schema";
 import { getEvent } from "../data-access/events";
 import { getGroupById } from "../data-access/groups";
 import { getMembership } from "../data-access/membership";
-import type { Group, GroupId } from "@acme/db/schema";
+import { AuthenticationError, NotFoundError } from "../use-cases/errors";
 import type { UserSession } from "../use-cases/types";
 
 function isGroupOwner(user: UserSession, group: Group) {

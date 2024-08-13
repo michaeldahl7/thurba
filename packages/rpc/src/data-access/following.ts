@@ -1,7 +1,7 @@
 import { database } from "@acme/db/client";
 import { Following, following } from "@acme/db/schema";
-import type { UserId } from "../use-cases/types";
 import { and, eq } from "drizzle-orm";
+import type { UserId } from "../use-cases/types";
 
 export async function createFollow(newFollow: {
   userId: UserId;

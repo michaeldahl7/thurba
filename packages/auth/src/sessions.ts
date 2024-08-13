@@ -1,6 +1,6 @@
-import { AuthenticationError } from "./util";
-import { lucia, validateRequest } from "./index";
 import type { UserId } from "lucia";
+import { lucia, validateRequest } from "./index";
+import { AuthenticationError } from "./util";
 
 export const getCurrentUser = async (sessionId: string | null) => {
   const session = await validateRequest(sessionId);

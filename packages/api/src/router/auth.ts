@@ -1,11 +1,11 @@
-import type { TRPCRouterRecord } from "@trpc/server";
-import { z } from "zod";
-import { generateState } from "arctic";
 import { github } from "@acme/auth";
-import { serializeCookie } from "oslo/cookie";
 import { desc, eq } from "@acme/db";
 import { users } from "@acme/db/schema";
 import { hash } from "@node-rs/argon2";
+import type { TRPCRouterRecord } from "@trpc/server";
+import { generateState } from "arctic";
+import { serializeCookie } from "oslo/cookie";
+import { z } from "zod";
 import { publicProcedure } from "../trpc"; //protectedProcedure,
 
 export const authRouter = {

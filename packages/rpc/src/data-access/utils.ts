@@ -1,5 +1,5 @@
-import { database } from "@acme/db/client";
 import crypto from "node:crypto";
+import { database } from "@acme/db/client";
 
 export async function generateRandomToken(length: number) {
   const buf = await new Promise<Buffer>((resolve, reject) => {

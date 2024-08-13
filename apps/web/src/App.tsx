@@ -1,14 +1,14 @@
-import {
-  RouterProvider,
-  createRouter,
-  ErrorComponent,
-} from "@tanstack/react-router";
-// Import the generated route tree
-import { routeTree } from "./routeTree.gen";
 // import { TRPCProvider } from "./utils/api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  ErrorComponent,
+  RouterProvider,
+  createRouter,
+} from "@tanstack/react-router";
 // import { AuthClient } from "./auth/AuthClient";
 import { Spinner } from "./components/Spinner";
+// Import the generated route tree
+import { routeTree } from "./routeTree.gen";
 // import { queryClient } from "./utils/queryClient";
 // Create a new router instance
 export const queryClient = new QueryClient();

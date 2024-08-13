@@ -1,8 +1,8 @@
+import { Button } from "@acme/ui/button";
 // import React from "react";
 // import { useAuth } from "../hooks/useAuth";
 // import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@acme/ui/button";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,

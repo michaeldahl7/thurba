@@ -1,11 +1,11 @@
-import { Hono } from "hono";
-import { csrf } from "hono/csrf";
 import { lucia, validateRequest } from "@acme/auth";
+import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { csrf } from "hono/csrf";
 import type { Context } from "./lib/context";
-import login from "./routes/login/github";
-import logout from "./routes/auth/logout";
 import getSession from "./routes/auth/getSession";
+import logout from "./routes/auth/logout";
+import login from "./routes/login/github";
 
 const app = new Hono<Context>();
 

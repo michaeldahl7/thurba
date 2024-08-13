@@ -1,9 +1,9 @@
 import { database } from "@acme/db/client";
 import {
+  events,
   type Event,
   type GroupId,
   type NewEvent,
-  events,
 } from "@acme/db/schema";
 import { asc, eq } from "drizzle-orm";
 

@@ -1,14 +1,14 @@
 import { relations } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
-  timestamp,
-  text,
-  pgEnum,
-  serial,
   boolean,
   integer,
+  pgEnum,
   pgTableCreator,
+  serial,
+  text,
+  timestamp,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 
 export const createTable = pgTableCreator((name) => `thurba_${name}`);
 

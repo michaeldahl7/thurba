@@ -1,9 +1,9 @@
+import crypto from "node:crypto";
 import { database } from "@acme/db/client";
 import { type User, accounts, users } from "@acme/db/schema";
 import { eq } from "drizzle-orm";
-import crypto from "node:crypto";
-import type { UserId } from "../use-cases/types";
 import { getAccountByUserId } from "../data-access/accounts";
+import type { UserId } from "../use-cases/types";
 
 const ITERATIONS = 10000;
 

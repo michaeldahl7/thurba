@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { hc } from "hono/client";
 import type { AppType } from "@acme/rpc";
+import { hc } from "hono/client";
 
 const client = hc<AppType>("http://localhost:3000");
 

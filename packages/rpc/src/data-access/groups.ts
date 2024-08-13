@@ -6,9 +6,9 @@ import {
   groups,
   memberships,
 } from "@acme/db/schema";
+import { and, count, eq, ilike, sql } from "drizzle-orm";
 import type { UserId } from "../use-cases/types";
 import { omit } from "../util/util";
-import { and, count, eq, ilike, sql } from "drizzle-orm";
 
 function appendGroupMemberCount<T extends { memberships: any[] }>(group: T) {
   return omit(

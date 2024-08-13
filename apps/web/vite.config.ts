@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import react from "@vitejs/plugin-react-swc";
+import { defineConfig } from "vite";
 // import { fileURLToPath } from "node:url";
 // import path from "node:path";
 // import createJiti from "jiti";

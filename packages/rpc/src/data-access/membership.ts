@@ -1,7 +1,7 @@
 import { database } from "@acme/db/client";
 import { type Membership, memberships } from "@acme/db/schema";
-import type { UserId } from "../use-cases/types";
 import { and, eq } from "drizzle-orm";
+import type { UserId } from "../use-cases/types";
 
 export async function getMembership(userId: UserId, groupId: number) {
   return await database.query.memberships.findFirst({

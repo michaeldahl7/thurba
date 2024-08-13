@@ -1,7 +1,7 @@
 import { database } from "@acme/db/client";
 import { type Profile, profiles } from "@acme/db/schema";
-import type { UserId } from "../use-cases/types";
 import { eq } from "drizzle-orm";
+import type { UserId } from "../use-cases/types";
 
 export async function createProfile(
   userId: UserId,

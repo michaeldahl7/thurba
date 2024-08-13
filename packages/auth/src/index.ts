@@ -1,12 +1,12 @@
-import { Lucia } from "lucia";
-import type { User, Session } from "lucia";
-import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
 import { database } from "@acme/db/client";
-import { GitHub, Google } from "arctic";
-import { env } from "../env";
-import type { UserId as CustomUserId } from "./types";
 // import { AuthenticationError } from "./util";
 import { sessions, users } from "@acme/db/schema";
+import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
+import { GitHub, Google } from "arctic";
+import { Lucia } from "lucia";
+import type { Session, User } from "lucia";
+import { env } from "../env";
+import type { UserId as CustomUserId } from "./types";
 
 export const adapter = new DrizzlePostgreSQLAdapter(
   database,

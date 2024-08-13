@@ -4,8 +4,8 @@ import {
   type Notification,
   notifications,
 } from "@acme/db/schema";
-import type { UserId } from "../use-cases/types";
 import { and, eq } from "drizzle-orm";
+import type { UserId } from "../use-cases/types";
 
 const MAX_NOTIFICATIONS_TO_RETURN = 30;
 const MAX_NOTIFICATIONS_IN_HEADER = 3;
