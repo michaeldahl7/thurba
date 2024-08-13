@@ -13,6 +13,14 @@
       "cache": false,
       "persistent": true
     },
+    "//#format": {},
+    "//#format:fix": {
+      "cache": false
+    },
+    "//#lint": {},
+    "//#lint:fix": {
+      "cache": false
+    },
     "//#format-and-lint": {},
     "//#format-and-lint:fix": {
       "cache": false
