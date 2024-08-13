@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
-import { lucia, github } from "@acme/auth"; //validateRequest,
+import { github } from "@acme/auth"; //validateRequest,
 import { setSession } from "@acme/auth/sessions";
 
 import { getAccountByGithubId } from "../../data-access/accounts";
@@ -86,20 +86,6 @@ const app = new Hono<Context>()
       }
       return c.body(null, 500);
     }
-  })
-  .post("/api/logout", async (c) => {
-    const sessionId = getCookie(c, lucia.sessionCookieName);
-    if (sessionId) {
-      await lucia.invalidateSession(sessionId);
-    }
-    const sessionCookie = lucia.createBlankSessionCookie();
-    setCookie(
-      c,
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes,
-    );
-    return c.json({ success: true });
   });
 
 function getPrimaryEmail(emails: Email[]): string {

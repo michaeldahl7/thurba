@@ -28,8 +28,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@acme/api": "workspace:*",
-    "@acme/rpc": "workspace:*",
     "@acme/tailwind-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
     "@types/react": "^18.3.3",

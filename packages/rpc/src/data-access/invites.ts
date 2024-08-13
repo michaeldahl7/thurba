@@ -1,5 +1,5 @@
 import { database } from "@acme/db/client";
-import { GroupId, invites } from "@acme/db/schema";
+import { type GroupId, invites } from "@acme/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function getInvite(token: string) {

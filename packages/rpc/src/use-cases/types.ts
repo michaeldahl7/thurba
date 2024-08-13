@@ -27,9 +27,9 @@ export interface GitHubUser {
   email: string;
 }
 
-interface Email {
-  email: string;
-  primary: boolean;
-  verified: boolean;
-  visibility: string | null;
-}
+// interface Email {
+//   email: string;
+//   primary: boolean;
+//   verified: boolean;
+//   visibility: string | null;
+// }

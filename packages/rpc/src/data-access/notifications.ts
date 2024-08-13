@@ -1,6 +1,10 @@
 import { database } from "@acme/db/client";
-import { GroupId, Notification, notifications } from "@acme/db/schema";
-import { UserId } from "../use-cases/types";
+import {
+  type GroupId,
+  type Notification,
+  notifications,
+} from "@acme/db/schema";
+import type { UserId } from "../use-cases/types";
 import { and, eq } from "drizzle-orm";
 
 const MAX_NOTIFICATIONS_TO_RETURN = 30;

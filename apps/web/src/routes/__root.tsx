@@ -11,7 +11,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { Spinner } from "../components/Spinner";
 
 function RouterSpinner() {
-  const isLoading = useRouterState({ select: (s) => s.status === "idle" });
+  const isLoading = useRouterState({ select: (s) => s.status === "pending" });
   return <Spinner show={isLoading} />;
 }
 
@@ -28,7 +28,7 @@ function RootComponent() {
     <>
       <div className="p-2 flex gap-2">
         <Link to="/" className="[&.active]:font-bold">
-          Home
+          Homes
         </Link>{" "}
       </div>
       <hr />

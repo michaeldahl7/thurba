@@ -1,8 +1,8 @@
 import { database } from "@acme/db/client";
-import { User, accounts, users } from "@acme/db/schema";
+import { type User, accounts, users } from "@acme/db/schema";
 import { eq } from "drizzle-orm";
-import crypto from "crypto";
-import { UserId } from "../use-cases/types";
+import crypto from "node:crypto";
+import type { UserId } from "../use-cases/types";
 import { getAccountByUserId } from "../data-access/accounts";
 
 const ITERATIONS = 10000;
@@ -86,7 +86,7 @@ export async function verifyPassword(email: string, plainTextPassword: string) {
   }
 
   const hash = await hashPassword(plainTextPassword, salt);
-  return account.password == hash;
+  return account.password === hash;
 }
 
 export async function getUserByEmail(email: string) {

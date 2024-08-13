@@ -1,5 +1,5 @@
 import { database } from "@acme/db/client";
-import { NewReply, Reply, reply } from "@acme/db/schema";
+import { type NewReply, type Reply, reply } from "@acme/db/schema";
 import { count, eq } from "drizzle-orm";
 
 export async function getReplyCountOnPost(postId: number) {

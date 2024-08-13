@@ -143,9 +143,6 @@ importers:
         specifier: ^3.23.8
         version: 3.23.8
     devDependencies:
-      '@acme/api':
-        specifier: workspace:*
-        version: link:../../packages/api
       '@acme/tailwind-config':
         specifier: workspace:*
         version: link:../../tooling/tailwind

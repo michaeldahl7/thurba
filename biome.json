@@ -37,6 +37,8 @@
     {
       "include": [
         "packages/db/dist/**",
+        "packages/rpc/dist/**",
+        "packages/auth/dist/**",
         "packages/api/dist/**",
         "packages/ui/dist/**",
         "packages/validators/dist/**"
