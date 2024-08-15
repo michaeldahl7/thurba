@@ -16,7 +16,7 @@ Repo where I am learning and refining my skills in the following technologies:
 - GitHub Actions
 
 
-Shoutout to the following opensource projects that inspired this repo: \
+Shoutout to the following open source projects that inspired this repo: \
 -- create-t3-turbo https://github.com/t3-oss/create-t3-turbo \
 -- wdc-saas-starter-kit https://github.com/t3-oss/wdc-saas-starter-kit \
 -- cloudflare-saas-stack https://github.com/t3-oss/cloudflare-saas-stack
