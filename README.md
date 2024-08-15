@@ -9,9 +9,12 @@ Repo where I am learning and refining my skills in the following technologies:
 - Postgres
 - NodeJS
 - TypeScript
+- Tailwind CSS
 - Shadcn UI
 - Lucia
 - Biome
+- GitHub Actions
+
 
 Shoutout to the following opensource projects that inspired this repo: \
 -- create-t3-turbo https://github.com/t3-oss/create-t3-turbo \
