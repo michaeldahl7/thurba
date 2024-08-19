@@ -53,6 +53,10 @@ export const validateRequest = async (
   return result;
 };
 
+export const invalidateSessionToken = async (sessionId: string) => {
+  await lucia.invalidateSession(sessionId);
+};
+
 export const github = new GitHub(
   env.GITHUB_CLIENT_ID,
   env.GITHUB_CLIENT_SECRET,
@@ -63,3 +67,5 @@ export const google = new Google(
   env.GOOGLE_CLIENT_SECRET,
   `${env.HOST_NAME}/api/login/google/callback`,
 );
+
+export type { Session, User };

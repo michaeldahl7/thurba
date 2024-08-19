@@ -1,4 +1,3 @@
-import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   Link,
@@ -7,37 +6,73 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-// import type { AuthClient } from "../auth/AuthClient";
-import { Spinner } from "../components/Spinner";
 
-function RouterSpinner() {
-  const isLoading = useRouterState({ select: (s) => s.status === "pending" });
-  return <Spinner show={isLoading} />;
+import { Spinner } from "../components/Spinner";
+import type { trpcQueryUtils } from "../router";
+
+export interface RouterAppContext {
+  trpcQueryUtils: typeof trpcQueryUtils;
 }
 
-export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient;
-}>()({
+export const Route = createRootRouteWithContext<RouterAppContext>()({
   component: RootComponent,
 });
 
-// });
-
 function RootComponent() {
+  const isFetching = useRouterState({ select: (s) => s.isLoading });
+
   return (
     <>
-      <div className="p-2 flex gap-2">
-        <Link to="/" className="[&.active]:font-bold">
-          Homes
-        </Link>{" "}
+      <div className={"min-h-screen flex flex-col"}>
+        <div className={"flex items-center border-b gap-2"}>
+          <h1 className={"text-3xl p-2"}>With tRPC</h1>
+          {/* Show a global spinner when the router is transitioning */}
+          <div
+            className={`text-3xl duration-300 delay-0 opacity-0 ${
+              isFetching ? " duration-1000 opacity-40" : ""
+            }`}
+          >
+            <Spinner />
+          </div>
+        </div>
+        <div className={"flex-1 flex"}>
+          <div className={"divide-y w-56"}>
+            {(
+              [
+                ["/", "Home"],
+                ["/dashboard", "Dashboard"],
+              ] as const
+            ).map(([to, label]) => {
+              return (
+                <div key={to}>
+                  <Link
+                    to={to}
+                    activeOptions={
+                      {
+                        // If the route points to the root of it's parent,
+                        // make sure it's only active if it's exact
+                        // exact: to === '.',
+                      }
+                    }
+                    preload="intent"
+                    className={"block py-2 px-3 text-blue-700"}
+                    // Make "active" links bold
+                    activeProps={{ className: "font-bold" }}
+                  >
+                    {label}
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+          <div className={"flex-1 border-l border-gray-200"}>
+            {/* Render our first route match */}
+            <Outlet />
+          </div>
+        </div>
       </div>
-      <hr />
-      <div className={"text-3xl"}>
-        <RouterSpinner />
-      </div>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="top-right" />
-      <TanStackRouterDevtools position="bottom-right" />
+      <TanStackRouterDevtools position="bottom-left" />
+      <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
     </>
   );
 }

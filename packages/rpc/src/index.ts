@@ -6,6 +6,7 @@ import type { Context } from "./lib/context";
 import getSession from "./routes/auth/getSession";
 import logout from "./routes/auth/logout";
 import login from "./routes/login/github";
+import posts from "./routes/posts";
 
 const app = new Hono<Context>();
 
@@ -43,7 +44,8 @@ app.use("*", async (c, next) => {
 const routes = app
   .route("/login", login)
   .route("/logout", logout)
-  .route("/getSession", getSession);
+  .route("/getSession", getSession)
+  .route("/posts", posts);
 
 export { app };
 export type AppType = typeof routes;

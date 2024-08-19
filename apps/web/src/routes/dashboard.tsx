@@ -1,32 +1,47 @@
-import { Button } from "@acme/ui/button";
-// import React from "react";
-// import { useAuth } from "../hooks/useAuth";
-// import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/dashboard")({
-  component: Dashboard,
+  component: DashboardComponent,
 });
 
-function Dashboard() {
-  function signOut(): void {
-    console.log("Signing out");
-  }
-
-  //   const { signOut } = useAuth();
-  //   const { data: user } = useQuery(["currentUser"]);
-  //   const { data: notifications } = useQuery(["notifications"]);
-
-  //   if (!user) return <div>Loading...</div>;
-
+function DashboardComponent() {
   return (
-    <div>
-      <h1 className="text-blue-300">Welcome, user.name!</h1>
-      <Button variant="destructive" onClick={() => signOut()}>
-        Sign Out
-      </Button>
-      {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
-      <button onClick={() => signOut()}>Sign Out</button>
-    </div>
+    <>
+      <div className="flex items-center border-b">
+        <h2 className="text-xl p-2">Dashboard</h2>
+        <Link
+          to="/dashboard/posts/$postId"
+          params={{
+            postId: "3",
+          }}
+          className="py-1 px-2 text-xs bg-blue-500 text-white rounded-full"
+        >
+          1 New Invoice
+        </Link>
+      </div>
+      <div className="flex flex-wrap divide-x">
+        {(
+          [
+            [".", "Summary"],
+            ["/dashboard/posts", "Posts"],
+          ] as const
+        ).map(([to, label]) => {
+          return (
+            <Link
+              from={Route.fullPath}
+              key={to}
+              to={to}
+              activeOptions={{ exact: to === "." }}
+              activeProps={{ className: "font-bold" }}
+              className="p-2"
+            >
+              {label}
+            </Link>
+          );
+        })}
+      </div>
+      <hr />
+      <Outlet />
+    </>
   );
 }
