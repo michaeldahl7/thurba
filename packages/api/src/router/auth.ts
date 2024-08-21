@@ -27,40 +27,11 @@ import { protectedProcedure, publicProcedure } from "../trpc";
 import { z } from "zod";
 
 export const authRouter = {
-  githubLogin: publicProcedure.query(async () => {
-    const state = generateState();
-    const url = await github.createAuthorizationURL(state);
-
-    // Return the URL and state, we'll handle the response in the Hono route
-    return { url: url.toString(), state };
-  }),
-  //   handleGithubCallback: publicProcedure
-  //   .input(z.object({ code: z.string(), state: z.string() }))
-  //   .mutation(async ({ input }) => {
-  // 	try {
-  // 	  const tokens = await github.validateAuthorizationCode(input.code)
-  // 	  if (!input.code || !input.state || !storedState || input.state !== storedState) {
-  // 		return new Response(null, {
-  // 		  status: 400,
-  // 		});
-  // 	  // Fetch GitHub user info and handle user creation/login as in the original example
-  // 	  // Return user info or session token
-  // 	} catch (e) {
-  // 	  if (e instanceof OAuth2RequestError) {
-  // 		throw new TRPCError({
-  // 		  code: 'BAD_REQUEST',
-  // 		  message: 'Invalid OAuth callback'
-  // 		})
-  // 	  }
-  // 	  throw new TRPCError({
-  // 		code: 'INTERNAL_SERVER_ERROR',
-  // 		message: 'Something went wrong'
-  // 	  })
-  // 	}
-  //   }),
-
   getSession: publicProcedure.query(({ ctx }) => {
     return ctx.session;
+  }),
+  getUser: publicProcedure.query(({ ctx }) => {
+    return ctx.user;
   }),
   getSecretMessage: protectedProcedure.query(() => {
     return "you can see this secret message!";

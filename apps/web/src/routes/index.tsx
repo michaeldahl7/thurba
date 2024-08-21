@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 
-import { getCurrentUser, getHello } from "../utils/getSession";
+import { getHello } from "../utils/getSession";
 export const Route = createFileRoute("/")({
   component: IndexComponent,
 });

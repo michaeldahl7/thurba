@@ -5,6 +5,7 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@acme/auth": "workspace:*",
     "@acme/api": "workspace:*",
     "@acme/db": "workspace:*",
     "@acme/rpc": "workspace:*",

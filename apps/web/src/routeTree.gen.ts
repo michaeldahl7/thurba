@@ -16,6 +16,8 @@ import { Route as LoginImport } from './routes/login'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as IndexImport } from './routes/index'
 import { Route as DashboardIndexImport } from './routes/dashboard.index'
+import { Route as DashboardUserImport } from './routes/dashboard.user'
+import { Route as DashboardSessionImport } from './routes/dashboard.session'
 import { Route as DashboardPostsImport } from './routes/dashboard.posts'
 import { Route as DashboardPostsIndexImport } from './routes/dashboard.posts.index'
 import { Route as DashboardPostsPostIdImport } from './routes/dashboard.posts.$postId'
@@ -44,6 +46,16 @@ const IndexRoute = IndexImport.update({
 
 const DashboardIndexRoute = DashboardIndexImport.update({
   path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardUserRoute = DashboardUserImport.update({
+  path: '/user',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardSessionRoute = DashboardSessionImport.update({
+  path: '/session',
   getParentRoute: () => DashboardRoute,
 } as any)
 
@@ -101,6 +113,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardPostsImport
       parentRoute: typeof DashboardImport
     }
+    '/dashboard/session': {
+      id: '/dashboard/session'
+      path: '/session'
+      fullPath: '/dashboard/session'
+      preLoaderRoute: typeof DashboardSessionImport
+      parentRoute: typeof DashboardImport
+    }
+    '/dashboard/user': {
+      id: '/dashboard/user'
+      path: '/user'
+      fullPath: '/dashboard/user'
+      preLoaderRoute: typeof DashboardUserImport
+      parentRoute: typeof DashboardImport
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
@@ -134,6 +160,8 @@ export const routeTree = rootRoute.addChildren({
       DashboardPostsPostIdRoute,
       DashboardPostsIndexRoute,
     }),
+    DashboardSessionRoute,
+    DashboardUserRoute,
     DashboardIndexRoute,
   }),
   LoginRoute,
@@ -161,6 +189,8 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "dashboard.tsx",
       "children": [
         "/dashboard/posts",
+        "/dashboard/session",
+        "/dashboard/user",
         "/dashboard/"
       ]
     },
@@ -177,6 +207,14 @@ export const routeTree = rootRoute.addChildren({
         "/dashboard/posts/$postId",
         "/dashboard/posts/"
       ]
+    },
+    "/dashboard/session": {
+      "filePath": "dashboard.session.tsx",
+      "parent": "/dashboard"
+    },
+    "/dashboard/user": {
+      "filePath": "dashboard.user.tsx",
+      "parent": "/dashboard"
     },
     "/dashboard/": {
       "filePath": "dashboard.index.tsx",
