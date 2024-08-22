@@ -10,6 +10,8 @@ import { routeTree } from "./routeTree.gen";
 import type { AppRouter } from "@acme/api";
 import { Spinner } from "./components/Spinner";
 
+// import { env } from "./env/server";
+
 export const queryClient = new QueryClient();
 
 export const trpc = createTRPCReact<AppRouter>({});
@@ -18,7 +20,7 @@ export const trpcClient = trpc.createClient({
   links: [
     loggerLink({
       enabled: (op) =>
-        env.NODE_ENV === "development" ||
+        process.env.NODE_ENV === "development" ||
         (op.direction === "down" && op.result instanceof Error),
     }),
     httpBatchLink({

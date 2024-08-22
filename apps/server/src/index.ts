@@ -25,7 +25,6 @@ interface Email {
   visibility: string | null;
 }
 
-
 import { appRouter, createTRPCContext } from "@acme/api";
 import { trpcServer } from "@hono/trpc-server";
 import type { User, Session, AuthResponse } from "@acme/auth";
@@ -38,14 +37,19 @@ export interface Context extends Env {
   Variables: {
     user: User | null;
     session: Session | null;
-    auth: AuthResponse
+    auth: AuthResponse;
   };
 }
-const FRONTEND_URL = "http://localhost:5173";
+// const FRONTEND_URL = "http://localhost:5173";
 
 const app = new Hono<Context>();
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Your frontend URL
+    credentials: true,
+  }),
+);
 app.use(csrf());
 
 app.use("*", async (c, next) => {
@@ -65,9 +69,13 @@ app.use("*", async (c, next) => {
     } else {
       authResponse = { user, session };
       if (session.fresh) {
-        c.header("Set-Cookie", lucia.createSessionCookie(session.id).serialize(), {
-          append: true,
-        });
+        c.header(
+          "Set-Cookie",
+          lucia.createSessionCookie(session.id).serialize(),
+          {
+            append: true,
+          },
+        );
       }
     }
   }
@@ -81,12 +89,10 @@ app.use(
   trpcServer({
     router: appRouter,
     createContext: async (opts, honoContext) => {
-      const user = honoContext.get('user') as User;
-      const session = honoContext.get('session') as Session;
-      const auth = honoContext.get('auth') as AuthResponse;
+      const auth = honoContext.get("auth") as AuthResponse;
       return await createTRPCContext({
         honoContext,
-        session: auth
+        session: auth,
       });
     },
     onError({ error, path }) {
@@ -95,101 +101,101 @@ app.use(
   }),
 );
 
-app
-  .get("/getSession", async (c) => {
-    const user = c.get("user");
-    const session = c.get("session");
-    return c.json({ user, session });
-  })
-  .get("/protected", async (c) => {
-    const user = c.get("user");
-    if (!user) {
-      return c.json({ error: "Authentication required" }, 401);
-    }
-    return c.json({ user });
-  });
+// app
+//   .get("/getSession", async (c) => {
+//     const user = c.get("user");
+//     const session = c.get("session");
+//     return c.json({ user, session });
+//   })
+//   .get("/protected", async (c) => {
+//     const user = c.get("user");
+//     if (!user) {
+//       return c.json({ error: "Authentication required" }, 401);
+//     }
+//     return c.json({ user });
+//   });
 app.get("/hello", async (c) => {
   return c.text("Hello Hono!");
 });
-app.get("/login/github", async (c) => {
-  const state = generateState();
-  const url = await github.createAuthorizationURL(state);
-  setCookie(c, "github_oauth_state", state, {
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    maxAge: 60 * 10,
-    sameSite: "Lax",
-  });
-  return c.redirect(url.toString());
-});
-app.get("/login/github/callback", async (c) => {
-  const code = c.req.query("code")?.toString() ?? null;
-  const state = c.req.query("state")?.toString() ?? null;
-  const storedState = getCookie(c).github_oauth_state ?? null;
-  if (!code || !state || !storedState || state !== storedState) {
-    return c.body(null, 400);
-  }
-  try {
-    const tokens = await github.validateAuthorizationCode(code);
-    const githubUserResponse = await fetch("https://api.github.com/user", {
-      headers: {
-        Authorization: `Bearer ${tokens.accessToken}`,
-      },
-    });
-    const githubUser: GitHubUser = (await githubUserResponse.json()) as any;
-    const existingAccount = await getAccountByGithubId(githubUser.id);
-    if (existingAccount) {
-      await setSession(existingAccount.userId);
+// app.get("/login/github", async (c) => {
+//   const state = generateState();
+//   const url = await github.createAuthorizationURL(state);
+//   setCookie(c, "github_oauth_state", state, {
+//     path: "/",
+//     secure: process.env.NODE_ENV === "production",
+//     httpOnly: true,
+//     maxAge: 60 * 10,
+//     sameSite: "Lax",
+//   });
+//   return c.redirect(url.toString());
+// });
+// app.get("/login/github/callback", async (c) => {
+//   const code = c.req.query("code")?.toString() ?? null;
+//   const state = c.req.query("state")?.toString() ?? null;
+//   const storedState = getCookie(c).github_oauth_state ?? null;
+//   if (!code || !state || !storedState || state !== storedState) {
+//     return c.body(null, 400);
+//   }
+//   try {
+//     const tokens = await github.validateAuthorizationCode(code);
+//     const githubUserResponse = await fetch("https://api.github.com/user", {
+//       headers: {
+//         Authorization: `Bearer ${tokens.accessToken}`,
+//       },
+//     });
+//     const githubUser: GitHubUser = (await githubUserResponse.json()) as any;
+//     const existingAccount = await getAccountByGithubId(githubUser.id);
+//     if (existingAccount) {
+//       await setSession(existingAccount.userId);
 
-      return c.redirect(`${FRONTEND_URL}/auth-callback?success=true`);
-    }
-    if (!githubUser.email) {
-      const githubUserEmailResponse = await fetch(
-        "https://api.github.com/user/emails",
-        {
-          headers: {
-            Authorization: `Bearer ${tokens.accessToken}`,
-          },
-        },
-      );
-      const githubUserEmails =
-        (await githubUserEmailResponse.json()) as Email[];
+//       return c.redirect(`${FRONTEND_URL}/auth-callback?success=true`);
+//     }
+//     if (!githubUser.email) {
+//       const githubUserEmailResponse = await fetch(
+//         "https://api.github.com/user/emails",
+//         {
+//           headers: {
+//             Authorization: `Bearer ${tokens.accessToken}`,
+//           },
+//         },
+//       );
+//       const githubUserEmails =
+//         (await githubUserEmailResponse.json()) as Email[];
 
-      githubUser.email = getPrimaryEmail(githubUserEmails);
-    }
+//       githubUser.email = getPrimaryEmail(githubUserEmails);
+//     }
 
-    const userId = await createGithubUserUseCase(githubUser);
+//     const userId = await createGithubUserUseCase(githubUser);
 
-    await setSession(userId);
-    return c.redirect(`${FRONTEND_URL}/auth-callback?success=true`);
-  } catch (e) {
-    console.error("GitHub OAuth callback error:", e);
-    // Redirect to frontend with an error parameter
-    return c.redirect(
-      `${FRONTEND_URL}/auth-callback?error=authentication_failed`,
-    );
+//     await setSession(userId);
+//     return c.redirect(`${FRONTEND_URL}/auth-callback?success=true`);
+//   } catch (e) {
+//     console.error("GitHub OAuth callback error:", e);
+//     // Redirect to frontend with an error parameter
+//     return c.redirect(
+//       `${FRONTEND_URL}/auth-callback?error=authentication_failed`,
+//     );
 
-    // if (e instanceof OAuth2RequestError) {
-    //   if (e.message === "bad_verification_code") {
-    //     return c.body("Invalid authorization code", 400);
-    //   }
-    //   return c.body(`OAuth2 error: ${e.message}`, 400);
-    // }
+//     // if (e instanceof OAuth2RequestError) {
+//     //   if (e.message === "bad_verification_code") {
+//     //     return c.body("Invalid authorization code", 400);
+//     //   }
+//     //   return c.body(`OAuth2 error: ${e.message}`, 400);
+//     // }
 
-    // if (e instanceof Error) {
-    //   return c.body(`Internal server error: ${e.message}`, 500);
-    // }
+//     // if (e instanceof Error) {
+//     //   return c.body(`Internal server error: ${e.message}`, 500);
+//     // }
 
-    // return c.body("An unexpected error occurred", 500);
-  }
-});
+//     // return c.body("An unexpected error occurred", 500);
+//   }
+// });
 
-function getPrimaryEmail(emails: Email[]): string {
-  const primaryEmail = emails.find((email) => email.primary);
-  return primaryEmail!.email;
-}
-// app.get("/protected", async (c) => {
+// function getPrimaryEmail(emails: Email[]): string {
+//   const primaryEmail = emails.find((email) => email.primary);
+//   return primaryEmail!.email;
+// }
+// // app.get("/protected", async (c) => {
 //   const user = c.get("user");
 //   if (!user) {
 //     return c.json({ error: "Authentication required" }, 401);

@@ -13,10 +13,11 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
 import { Route as DashboardImport } from './routes/dashboard'
-import { Route as AuthenticatedImport } from './routes/_authenticated'
+import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
 import { Route as DashboardIndexImport } from './routes/dashboard.index'
 import { Route as DashboardPostsImport } from './routes/dashboard.posts'
+import { Route as AuthHelloImport } from './routes/_auth.hello'
 import { Route as DashboardPostsIndexImport } from './routes/dashboard.posts.index'
 import { Route as DashboardPostsPostIdImport } from './routes/dashboard.posts.$postId'
 
@@ -32,8 +33,8 @@ const DashboardRoute = DashboardImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthenticatedRoute = AuthenticatedImport.update({
-  id: '/_authenticated',
+const AuthRoute = AuthImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -50,6 +51,11 @@ const DashboardIndexRoute = DashboardIndexImport.update({
 const DashboardPostsRoute = DashboardPostsImport.update({
   path: '/posts',
   getParentRoute: () => DashboardRoute,
+} as any)
+
+const AuthHelloRoute = AuthHelloImport.update({
+  path: '/hello',
+  getParentRoute: () => AuthRoute,
 } as any)
 
 const DashboardPostsIndexRoute = DashboardPostsIndexImport.update({
@@ -73,11 +79,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/_authenticated': {
-      id: '/_authenticated'
+    '/_auth': {
+      id: '/_auth'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof AuthenticatedImport
+      preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
     '/dashboard': {
@@ -93,6 +99,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
+    }
+    '/_auth/hello': {
+      id: '/_auth/hello'
+      path: '/hello'
+      fullPath: '/hello'
+      preLoaderRoute: typeof AuthHelloImport
+      parentRoute: typeof AuthImport
     }
     '/dashboard/posts': {
       id: '/dashboard/posts'
@@ -129,6 +142,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
+  AuthRoute: AuthRoute.addChildren({ AuthHelloRoute }),
   DashboardRoute: DashboardRoute.addChildren({
     DashboardPostsRoute: DashboardPostsRoute.addChildren({
       DashboardPostsPostIdRoute,
@@ -148,7 +162,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_authenticated",
+        "/_auth",
         "/dashboard",
         "/login"
       ]
@@ -156,8 +170,11 @@ export const routeTree = rootRoute.addChildren({
     "/": {
       "filePath": "index.tsx"
     },
-    "/_authenticated": {
-      "filePath": "_authenticated.tsx"
+    "/_auth": {
+      "filePath": "_auth.tsx",
+      "children": [
+        "/_auth/hello"
+      ]
     },
     "/dashboard": {
       "filePath": "dashboard.tsx",
@@ -168,6 +185,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/login": {
       "filePath": "login.tsx"
+    },
+    "/_auth/hello": {
+      "filePath": "_auth.hello.tsx",
+      "parent": "/_auth"
     },
     "/dashboard/posts": {
       "filePath": "dashboard.posts.tsx",

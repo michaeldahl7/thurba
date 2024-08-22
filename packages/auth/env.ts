@@ -10,12 +10,7 @@ export const env = createEnv({
     NODE_ENV: z.string().optional(),
     HOST_NAME: z.string().min(1),
   },
-  runtimeEnv: {
-    NODE_ENV: process.env.NODE_ENV,
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
-    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
-    HOST_NAME: process.env.HOST_NAME,
-  },
+  runtimeEnv: process.env,
+  skipValidation:
+    !!process.env.CI || process.env.npm_lifecycle_event === "lint",
 });
