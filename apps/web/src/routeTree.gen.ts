@@ -11,23 +11,16 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as SigninImport } from './routes/signin'
 import { Route as LoginImport } from './routes/login'
 import { Route as DashboardImport } from './routes/dashboard'
+import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as IndexImport } from './routes/index'
 import { Route as DashboardIndexImport } from './routes/dashboard.index'
-import { Route as DashboardUserImport } from './routes/dashboard.user'
-import { Route as DashboardSessionImport } from './routes/dashboard.session'
 import { Route as DashboardPostsImport } from './routes/dashboard.posts'
 import { Route as DashboardPostsIndexImport } from './routes/dashboard.posts.index'
 import { Route as DashboardPostsPostIdImport } from './routes/dashboard.posts.$postId'
 
 // Create/Update Routes
-
-const SigninRoute = SigninImport.update({
-  path: '/signin',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const LoginRoute = LoginImport.update({
   path: '/login',
@@ -39,6 +32,11 @@ const DashboardRoute = DashboardImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AuthenticatedRoute = AuthenticatedImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
@@ -46,16 +44,6 @@ const IndexRoute = IndexImport.update({
 
 const DashboardIndexRoute = DashboardIndexImport.update({
   path: '/',
-  getParentRoute: () => DashboardRoute,
-} as any)
-
-const DashboardUserRoute = DashboardUserImport.update({
-  path: '/user',
-  getParentRoute: () => DashboardRoute,
-} as any)
-
-const DashboardSessionRoute = DashboardSessionImport.update({
-  path: '/session',
   getParentRoute: () => DashboardRoute,
 } as any)
 
@@ -85,6 +73,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedImport
+      parentRoute: typeof rootRoute
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -99,32 +94,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
-    '/signin': {
-      id: '/signin'
-      path: '/signin'
-      fullPath: '/signin'
-      preLoaderRoute: typeof SigninImport
-      parentRoute: typeof rootRoute
-    }
     '/dashboard/posts': {
       id: '/dashboard/posts'
       path: '/posts'
       fullPath: '/dashboard/posts'
       preLoaderRoute: typeof DashboardPostsImport
-      parentRoute: typeof DashboardImport
-    }
-    '/dashboard/session': {
-      id: '/dashboard/session'
-      path: '/session'
-      fullPath: '/dashboard/session'
-      preLoaderRoute: typeof DashboardSessionImport
-      parentRoute: typeof DashboardImport
-    }
-    '/dashboard/user': {
-      id: '/dashboard/user'
-      path: '/user'
-      fullPath: '/dashboard/user'
-      preLoaderRoute: typeof DashboardUserImport
       parentRoute: typeof DashboardImport
     }
     '/dashboard/': {
@@ -160,12 +134,9 @@ export const routeTree = rootRoute.addChildren({
       DashboardPostsPostIdRoute,
       DashboardPostsIndexRoute,
     }),
-    DashboardSessionRoute,
-    DashboardUserRoute,
     DashboardIndexRoute,
   }),
   LoginRoute,
-  SigninRoute,
 })
 
 /* prettier-ignore-end */
@@ -177,28 +148,26 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/_authenticated",
         "/dashboard",
-        "/login",
-        "/signin"
+        "/login"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
+    "/_authenticated": {
+      "filePath": "_authenticated.tsx"
+    },
     "/dashboard": {
       "filePath": "dashboard.tsx",
       "children": [
         "/dashboard/posts",
-        "/dashboard/session",
-        "/dashboard/user",
         "/dashboard/"
       ]
     },
     "/login": {
       "filePath": "login.tsx"
-    },
-    "/signin": {
-      "filePath": "signin.tsx"
     },
     "/dashboard/posts": {
       "filePath": "dashboard.posts.tsx",
@@ -207,14 +176,6 @@ export const routeTree = rootRoute.addChildren({
         "/dashboard/posts/$postId",
         "/dashboard/posts/"
       ]
-    },
-    "/dashboard/session": {
-      "filePath": "dashboard.session.tsx",
-      "parent": "/dashboard"
-    },
-    "/dashboard/user": {
-      "filePath": "dashboard.user.tsx",
-      "parent": "/dashboard"
     },
     "/dashboard/": {
       "filePath": "dashboard.index.tsx",

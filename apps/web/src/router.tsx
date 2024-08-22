@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
-import { httpBatchLink } from "@trpc/client";
+import { loggerLink, httpBatchLink } from "@trpc/client";
 import { createTRPCQueryUtils, createTRPCReact } from "@trpc/react-query";
 import SuperJSON from "superjson";
 
@@ -16,13 +16,17 @@ export const trpc = createTRPCReact<AppRouter>({});
 
 export const trpcClient = trpc.createClient({
   links: [
+    loggerLink({
+      enabled: (op) =>
+        env.NODE_ENV === "development" ||
+        (op.direction === "down" && op.result instanceof Error),
+    }),
     httpBatchLink({
       transformer: SuperJSON,
       url: "http://localhost:3000/trpc",
       fetch(url, options) {
         return fetch(url, {
           ...options,
-          credentials: "include",
         });
       },
       headers() {

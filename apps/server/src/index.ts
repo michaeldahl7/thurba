@@ -1,4 +1,3 @@
-// import { app } from "@acme/rpc";
 import { serve } from "@hono/node-server";
 import { getCookie, setCookie } from "hono/cookie";
 import { validateRequest } from "@acme/auth";
@@ -10,7 +9,6 @@ import { setSession } from "@acme/auth/sessions";
 import { getAccountByGithubId } from "../data-access/accounts";
 
 import { OAuth2RequestError, generateState } from "arctic";
-// import type { Context } from "../../lib/context";
 import { createGithubUserUseCase } from "../use-cases/users";
 
 export interface GitHubUser {
@@ -26,11 +24,11 @@ interface Email {
   verified: boolean;
   visibility: string | null;
 }
-// const app = new Hono();
+
 
 import { appRouter, createTRPCContext } from "@acme/api";
 import { trpcServer } from "@hono/trpc-server";
-import type { User, Session } from "@acme/auth";
+import type { User, Session, AuthResponse } from "@acme/auth";
 import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
 
@@ -40,12 +38,9 @@ export interface Context extends Env {
   Variables: {
     user: User | null;
     session: Session | null;
+    auth: AuthResponse
   };
 }
-
-// app.use(cors());
-// app.use(csrf());
-
 const FRONTEND_URL = "http://localhost:5173";
 
 const app = new Hono<Context>();
@@ -54,28 +49,30 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(csrf());
 
 app.use("*", async (c, next) => {
-  //   const sessionId = lucia.readSessionCookie(c.req.header("Cookie") ?? "");
   const sessionId = getCookie(c, lucia.sessionCookieName) ?? null;
 
+  let authResponse: AuthResponse;
+
   if (!sessionId) {
-    c.set("user", null);
-    c.set("session", null);
-    return next();
-  }
-  const { user, session } = await validateRequest(sessionId);
-  if (!session) {
-    c.header("Set-Cookie", lucia.createBlankSessionCookie().serialize(), {
-      append: true,
-    });
-  }
-  if (session?.fresh) {
-    c.header("Set-Cookie", lucia.createSessionCookie(session.id).serialize(), {
-      append: true,
-    });
+    authResponse = { user: null, session: null };
+  } else {
+    const { user, session } = await validateRequest(sessionId);
+    if (!session) {
+      authResponse = { user: null, session: null };
+      c.header("Set-Cookie", lucia.createBlankSessionCookie().serialize(), {
+        append: true,
+      });
+    } else {
+      authResponse = { user, session };
+      if (session.fresh) {
+        c.header("Set-Cookie", lucia.createSessionCookie(session.id).serialize(), {
+          append: true,
+        });
+      }
+    }
   }
 
-  c.set("user", user);
-  c.set("session", session);
+  c.set("auth", authResponse);
   await next();
 });
 
@@ -83,34 +80,15 @@ app.use(
   "/trpc/*",
   trpcServer({
     router: appRouter,
-    createContext: async (opts, c) => {
-      const headers = c.req.header();
-      const user = c.get("user");
-      const session = c.get("session");
+    createContext: async (opts, honoContext) => {
+      const user = honoContext.get('user') as User;
+      const session = honoContext.get('session') as Session;
+      const auth = honoContext.get('auth') as AuthResponse;
       return await createTRPCContext({
-        headers,
-        user,
-        session,
+        honoContext,
+        session: auth
       });
     },
-    // createContext: async (opts, c) => {
-    //   const rawHeaders = c.req.raw.headers;
-    //   const honoHeaders = c.req.header();
-
-    //   console.log("Raw Headers:", rawHeaders);
-    //   console.log("Hono Headers:", honoHeaders);
-    //   const headers = c.req.raw.headers;
-    //   const user: User = c.get("user");
-    //   const session: Session = c.get("session");
-
-    //   return await createTRPCContext({
-    //     rawHeaders,
-    //     honoHeaders,
-    //     session,
-    //     user,
-    //     c,
-    //   });
-    // },
     onError({ error, path }) {
       console.error(`>>> tRPC Error on '${path}'`, error);
     },

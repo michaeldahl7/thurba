@@ -1,20 +1,15 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 
-import { getHello } from "../utils/getSession";
+
 export const Route = createFileRoute("/")({
   component: IndexComponent,
 });
 
 function IndexComponent() {
-  const { data, isLoading } = getHello();
-  //   const { data, isLoading } = getCurrentUser();
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+
   return (
     <div className={"p-2"}>
-      {/* <div className={"text-lg"}>Welcome Home! {data?.user?.id}</div> */}
-      <div className={"text-lg"}>Welcome Home! {data?.message}</div>
+
       <hr className={"my-2"} />
       <Link
         to="/dashboard/posts/$postId"

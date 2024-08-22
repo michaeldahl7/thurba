@@ -9,21 +9,14 @@
 import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { lucia } from "@acme/auth"
+import type { Context as HonoContext } from 'hono';
+import type { User, Session} from "@acme/auth"
 
-import type { Session, User } from "@acme/auth";
-// import { auth, validateToken } from "@acme/auth";
-import { database } from "@acme/db/client";
+import type { AuthResponse } from "@acme/auth";
+import { getCookie } from 'hono/cookie';
 
-/**
- * Isomorphic Session getter for API requests
- * - Expo requests will have a session token in the Authorization header
- * - Next.js requests will have a session token in cookies
- */
-// const isomorphicGetSession = async (headers: Headers) => {
-//   const authToken = headers.get("Authorization") ?? null;
-//   if (authToken) return validateToken(authToken);
-//   return auth();
-// };
+import { database as db } from "@acme/db/client";
 
 /**
  * 1. CONTEXT
@@ -38,32 +31,20 @@ import { database } from "@acme/db/client";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: {
-  headers: Record<string, string>;
-  session: Session | null;
-  user: User | null;
+  honoContext: HonoContext;
+  session: AuthResponse
 }) => {
-  //   const authToken = opts.headers.get("Authorization") ?? null;
-  //   const session = await isomorphicGetSession(opts.headers);
+
   const session = opts.session;
-  const headers = opts.headers;
-  const user = opts.user;
-  const source = headers["x-trpc-source"] ?? "unknown";
-  console.log(
-    ">>> tRPC Request from",
-    source,
-    "by",
-    session?.userId,
-    "user",
-    user?.id,
-  ); //
+  const honoContext = opts.honoContext;
+
+  const source = opts.honoContext.req.raw.headers.get("x-trpc-source") ?? "unknown";
+  console.log(">>> tRPC Request from", source, "by", session?.user)
 
   return {
-    headers,
+    honoContext,
     session,
-    user,
-    database,
-    source,
-    // token: authToken,
+    db,
   };
 };
 
@@ -146,13 +127,14 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
-    if (!ctx.session?.userId) {
+    if (ctx.session.user === null || ctx.session.session === null)  {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
+
     return next({
       ctx: {
-        // infers the `session` as non-nullable
-        session: { ...ctx.session, user: ctx.session.userId },
+        ...ctx,
+        session: ctx.session as { user: User; session: Session },
       },
     });
   });

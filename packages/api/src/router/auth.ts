@@ -1,46 +1,158 @@
-// import { github } from "@acme/auth";
-// import { desc, eq } from "@acme/db";
-// import { users } from "@acme/db/schema";
-// import { hash } from "@node-rs/argon2";
-// import type { TRPCRouterRecord } from "@trpc/server";
-import { generateState } from "arctic";
-import { OAuth2RequestError } from "arctic";
-// import { serializeCookie } from "oslo/cookie";
-// import { z } from "zod";
-// import { publicProcedure } from "../trpc"; //protectedProcedure,
+import type { TRPCRouterRecord } from "@trpc/server"
 
-// export const authRouter = {
-//   loginGithub: publicProcedure.query(async () => {
-//     const state = generateState();
-//     const url = await github.createAuthorizationURL(state);
+import { protectedProcedure, publicProcedure } from "../trpc"
+import { initTRPC, TRPCError } from '@trpc/server';
+import { lucia } from "@acme/auth";
+import { github,  } from "@acme/auth";
+import { OAuth2RequestError, generateState,  } from "arctic";
 
-//     // Return the URL and state, we'll handle the response in the Hono route
-//     return { url: url.toString(), state };
-//   }),
-// } satisfies TRPCRouterRecord;
+import { generateIdFromEntropySize } from "lucia";
+import { parseCookies, serializeCookie } from "oslo/cookie";
+import type { User, Session } from "lucia";
+import type { Context as HonoContext } from 'hono';
+import { eq } from "@acme/db";
+import { accounts, profiles, users } from "@acme/db/schema";
 
-import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
+export interface GitHubUser {
+  id: string;
+  login: string;
+  avatar_url: string;
+  email: string;
+}
 
-import { github, invalidateSessionToken } from "@acme/auth";
+interface Email {
+  email: string;
+  primary: boolean;
+  verified: boolean;
+  visibility: string | null;
+}
 
-import { protectedProcedure, publicProcedure } from "../trpc";
-import { z } from "zod";
+interface AuthCallbackResult {
+  success: boolean;
+  userId: number;
+  isNewUser: boolean;
+}
+
 
 export const authRouter = {
   getSession: publicProcedure.query(({ ctx }) => {
-    return ctx.session;
-  }),
-  getUser: publicProcedure.query(({ ctx }) => {
-    return ctx.user;
+    return ctx.session
   }),
   getSecretMessage: protectedProcedure.query(() => {
-    return "you can see this secret message!";
+    return "you can see this secret message!"
   }),
-  signOut: protectedProcedure.mutation(async (opts) => {
-    if (!opts.ctx.session) {
-      return { success: false };
+  githubLogin: publicProcedure.mutation(async ({ ctx }) => {
+    const state = generateState();
+    const url = await github.createAuthorizationURL(state);
+    
+    ctx.honoContext.header('Set-Cookie', serializeCookie("github_oauth_state", state, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 10,
+      path: "/"
+    }));
+
+    return { url: url.toString() };
+  }),
+
+  githubCallback: publicProcedure.query(async ({ ctx }) => {
+    const { honoContext, db } = ctx;
+    const cookies = parseCookies(honoContext.req.raw.headers.get("Cookie") ?? "");
+    const stateCookie = cookies.get("github_oauth_state") ?? null;
+
+    const url = new URL(honoContext.req.url);
+    const state = url.searchParams.get("state");
+    const code = url.searchParams.get("code");
+
+    if (!state || !stateCookie || !code || stateCookie !== state) {
+      throw new TRPCError({ code: 'BAD_REQUEST' });
     }
-    await invalidateSessionToken(opts.ctx.session.id);
-    return { success: true };
-  }),
-} satisfies TRPCRouterRecord;
+
+    try {
+      const tokens = await github.validateAuthorizationCode(code);
+      const githubUserResponse = await fetch("https://api.github.com/user", {
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`
+        }
+      });
+      const githubUser: GitHubUser = (await githubUserResponse.json()) as any;
+
+      const existingAccount = await ctx.db.query.accounts.findFirst({
+        where: eq(accounts.githubId, githubUser.id),
+      });
+
+      if (existingAccount) {
+        const session = await lucia.createSession(existingAccount.userId, {});
+        const sessionCookie = lucia.createSessionCookie(session.id);
+        
+        honoContext.header('Set-Cookie', sessionCookie.serialize());
+        // await setSession(existingAccount.userId);
+        return { 
+          success: true, 
+          userId: existingAccount.userId,
+          isNewUser: false
+        };
+      }
+
+      if (!githubUser.email) {
+        const githubUserEmailResponse = await fetch(
+          "https://api.github.com/user/emails",
+          {
+            headers: {
+              Authorization: `Bearer ${tokens.accessToken}`,
+            },
+          },
+        );
+        const githubUserEmails =
+          (await githubUserEmailResponse.json()) as Email[];
+
+        githubUser.email = getPrimaryEmail(githubUserEmails);
+      }
+
+      // const [user] = await ctx.db.insert(users).values({email: githubUser.email}).returning()
+      return await db.transaction(async (tx) => {
+        const [newUser] = await tx.insert(users).values({
+          email: githubUser.email,
+        }).returning();
+
+        await tx.insert(accounts).values({
+          userId: newUser.id,
+          accountType: 'github',
+          githubId: githubUser.id,
+        });
+
+        await tx.insert(profiles).values({
+          userId: newUser.id,
+          displayName: githubUser.login,
+          image: githubUser.avatar_url,
+        });
+
+        const session = await lucia.createSession(newUser.id, {});
+        const sessionCookie = lucia.createSessionCookie(session.id);
+  
+        honoContext.header('Set-Cookie', sessionCookie.serialize());
+  
+        return { 
+          success: true, 
+          userId: newUser.id,
+          isNewUser: true
+        };
+    })
+
+
+
+    } catch (e) {
+      if (e instanceof OAuth2RequestError) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid OAuth credentials' });
+      }
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+    }
+  })
+} satisfies TRPCRouterRecord
+
+
+
+function getPrimaryEmail(emails: Email[]): string {
+  const primaryEmail = emails.find((email) => email.primary);
+  return primaryEmail!.email;
+}
