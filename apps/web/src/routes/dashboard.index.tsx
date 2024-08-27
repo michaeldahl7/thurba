@@ -12,14 +12,17 @@ export const Route = createFileRoute("/dashboard/")({
 
 function DashboardIndexComponent() {
   const postsQuery = trpc.post.posts.useQuery();
+  const authQuery = trpc.auth.getSession.useQuery();
 
   const posts = postsQuery.data || [];
+  const auth = authQuery.data;
 
   return (
     <div className="p-2">
       <div className="p-2">
         Welcome to the dashboard! You have{" "}
         <strong>{posts.length} total posts</strong>.
+        <div>Auth: {JSON.stringify(auth)}</div>
       </div>
     </div>
   );

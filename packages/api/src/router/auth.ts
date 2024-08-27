@@ -53,7 +53,7 @@ export const authRouter = {
         path: "/",
       }),
     );
-    console.log("url", url.toString());
+
     return { url: url.toString() };
   }),
 

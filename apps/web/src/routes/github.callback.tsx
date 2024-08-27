@@ -1,42 +1,29 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { trpc } from "../router";
-// import { trpc } from "../router";
+import { z } from "zod";
 
 export const Route = createFileRoute("/github/callback")({
-  component: GitHubCallbackHandler,
+  validateSearch: z.object({
+    code: z.string(),
+    state: z.string(),
+  }),
+  component: GitHubCallbackHandlerComponent,
+  //   loaderDeps: ({ search: { code, state } }) => ({
+  //     code,
+  //     state,
+  //   }),
+  //   loader: (opts) => {
+  // 	opts.context.trpcQueryUtils.auth.
+  //   loader: ({ deps: { code, state } }) => {
+  //     return { code, state };
+  //   },
 });
 
-export function GitHubCallbackHandler() {
-  const navigate = useNavigate();
-
-  const githubCallbackMutation = trpc.auth.githubCallback.useMutation({
-    onSuccess: (data) => {
-      console.log("GitHub authentication successful:", data);
-      navigate({ to: "/dashboard" });
-    },
-    onError: (error) => {
-      console.error("GitHub authentication failed:", error);
-      navigate({ to: "/login" });
-    },
-  });
-
-  // Extract code and state from URL
-  const searchParams = new URLSearchParams(window.location.search);
-  const code = searchParams.get("code");
-  const state = searchParams.get("state");
-
-  // Trigger the mutation immediately if code and state are present
-  if (code && state) {
-    githubCallbackMutation.mutate({ code, state });
-  } else {
-    console.error("Missing code or state");
-    navigate({ to: "/login" });
-  }
-
-  if (githubCallbackMutation.isPending) {
-    return <div>Completing your sign-in...</div>;
-  }
-
-  // This will only be reached if there's an error in extracting code/state
-  return null;
+function GitHubCallbackHandlerComponent() {
+  const { code, state } = Route.useSearch();
+  return (
+    <div>
+      Hello /github/callback! Code: {code}, State: {state}
+    </div>
+  );
 }

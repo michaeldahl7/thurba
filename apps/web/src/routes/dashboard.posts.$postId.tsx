@@ -31,7 +31,7 @@ function DashboardPostsPostIdComponent() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   React.useEffect(() => {
     navigate({
-      search: (old) => ({ ...old, notes: notes ? notes : undefined }),
+      search: (old: any) => ({ ...old, notes: notes ? notes : undefined }),
       replace: true,
       params: true,
     });
@@ -63,7 +63,7 @@ function DashboardPostsPostIdComponent() {
       <div>
         <Link
           from={Route.fullPath}
-          search={(old) => ({
+          search={(old: any) => ({
             ...old,
             showNotes: old.showNotes ? undefined : true,
           })}

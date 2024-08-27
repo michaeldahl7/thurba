@@ -10,16 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@acme/ui": "workspace:*",
     "@acme/auth": "workspace:*",
     "@acme/db": "workspace:*",
     "@acme/rpc": "workspace:*",
+    "@acme/ui": "workspace:*",
     "@tanstack/react-form": "^0.27.0",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-devtools": "^5.51.21",
     "@tanstack/react-router": "^1.46.4",
     "@tanstack/router-devtools": "^1.46.4",
     "@tanstack/router-plugin": "^1.45.13",
+    "@tanstack/router-zod-adapter": "^1.51.0",
     "@tanstack/zod-form-adapter": "^0.27.0",
     "@trpc/client": "catalog:",
     "@trpc/react-query": "catalog:",

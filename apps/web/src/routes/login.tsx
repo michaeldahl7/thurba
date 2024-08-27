@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { trpc } from "../router";
 
@@ -13,6 +13,9 @@ export function LoginPage() {
   const initiateGithubLogin = async () => {
     try {
       const { url } = await githubLoginMutation.mutateAsync();
+      //   throw redirect({
+      //     to: url,
+      //   });
       window.location.href = url; // Redirect to GitHub
     } catch (error) {
       console.error("Failed to initiate GitHub login", error);
@@ -23,6 +26,7 @@ export function LoginPage() {
     <div>
       <h2>Login</h2>
       {/* <h3>Secret message: {data}</h3> */}
+      {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
       <button onClick={initiateGithubLogin}>Sign in with GitHub</button>
     </div>
   );
