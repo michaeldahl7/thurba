@@ -7,7 +7,7 @@ export const Route = createFileRoute("/login")({
 });
 
 export function LoginPage() {
-  const { data } = trpc.auth.getSecretMessage.useQuery();
+  //   const { data } = trpc.auth.getSecretMessage.useQuery();
   const githubLoginMutation = trpc.auth.githubLogin.useMutation();
 
   const initiateGithubLogin = async () => {
@@ -22,7 +22,7 @@ export function LoginPage() {
   return (
     <div>
       <h2>Login</h2>
-      <h3>Secret message: {data}</h3>
+      {/* <h3>Secret message: {data}</h3> */}
       <button onClick={initiateGithubLogin}>Sign in with GitHub</button>
     </div>
   );

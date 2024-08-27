@@ -16,8 +16,8 @@ export const adapter = new DrizzlePostgreSQLAdapter(
 
 export type AuthResponse =
   | { user: User; session: Session }
-  | { user: null; session: null }
-  
+  | { user: null; session: null };
+
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
     attributes: {

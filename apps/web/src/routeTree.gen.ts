@@ -11,17 +11,24 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as OnboardingImport } from './routes/onboarding'
 import { Route as LoginImport } from './routes/login'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
 import { Route as DashboardIndexImport } from './routes/dashboard.index'
+import { Route as GithubCallbackImport } from './routes/github.callback'
 import { Route as DashboardPostsImport } from './routes/dashboard.posts'
 import { Route as AuthHelloImport } from './routes/_auth.hello'
 import { Route as DashboardPostsIndexImport } from './routes/dashboard.posts.index'
 import { Route as DashboardPostsPostIdImport } from './routes/dashboard.posts.$postId'
 
 // Create/Update Routes
+
+const OnboardingRoute = OnboardingImport.update({
+  path: '/onboarding',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LoginRoute = LoginImport.update({
   path: '/login',
@@ -46,6 +53,11 @@ const IndexRoute = IndexImport.update({
 const DashboardIndexRoute = DashboardIndexImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+
+const GithubCallbackRoute = GithubCallbackImport.update({
+  path: '/github/callback',
+  getParentRoute: () => rootRoute,
 } as any)
 
 const DashboardPostsRoute = DashboardPostsImport.update({
@@ -100,6 +112,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingImport
+      parentRoute: typeof rootRoute
+    }
     '/_auth/hello': {
       id: '/_auth/hello'
       path: '/hello'
@@ -113,6 +132,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/posts'
       preLoaderRoute: typeof DashboardPostsImport
       parentRoute: typeof DashboardImport
+    }
+    '/github/callback': {
+      id: '/github/callback'
+      path: '/github/callback'
+      fullPath: '/github/callback'
+      preLoaderRoute: typeof GithubCallbackImport
+      parentRoute: typeof rootRoute
     }
     '/dashboard/': {
       id: '/dashboard/'
@@ -151,6 +177,8 @@ export const routeTree = rootRoute.addChildren({
     DashboardIndexRoute,
   }),
   LoginRoute,
+  OnboardingRoute,
+  GithubCallbackRoute,
 })
 
 /* prettier-ignore-end */
@@ -164,7 +192,9 @@ export const routeTree = rootRoute.addChildren({
         "/",
         "/_auth",
         "/dashboard",
-        "/login"
+        "/login",
+        "/onboarding",
+        "/github/callback"
       ]
     },
     "/": {
@@ -186,6 +216,9 @@ export const routeTree = rootRoute.addChildren({
     "/login": {
       "filePath": "login.tsx"
     },
+    "/onboarding": {
+      "filePath": "onboarding.tsx"
+    },
     "/_auth/hello": {
       "filePath": "_auth.hello.tsx",
       "parent": "/_auth"
@@ -197,6 +230,9 @@ export const routeTree = rootRoute.addChildren({
         "/dashboard/posts/$postId",
         "/dashboard/posts/"
       ]
+    },
+    "/github/callback": {
+      "filePath": "github.callback.tsx"
     },
     "/dashboard/": {
       "filePath": "dashboard.index.tsx",
