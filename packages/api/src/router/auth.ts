@@ -1,5 +1,5 @@
-import type { TRPCRouterRecord } from "@trpc/server";
 import { github, lucia } from "@acme/auth";
+import type { TRPCRouterRecord } from "@trpc/server";
 import { generateState } from "arctic";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
