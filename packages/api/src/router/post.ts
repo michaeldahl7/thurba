@@ -2,7 +2,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
 // import { posts } from "@acme/db/schema";
-import { publicProcedure, protectedProcedure } from "../trpc"; //protectedProcedure,
+import { protectedProcedure, publicProcedure } from "../trpc"; //protectedProcedure,
 
 const POSTS = [
   { id: "1", title: "First post" },
@@ -32,8 +32,7 @@ export const postRouter = {
   //   return ctx.db.insert(Post).values(input)
   // }),
 
-// delete: protectedProcedure.input(z.string()).mutation(({ ctx, input }) => {
-//   return ctx.db.delete(Post).where(eq(Post.id, input))
-// }),
-
+  // delete: protectedProcedure.input(z.string()).mutation(({ ctx, input }) => {
+  //   return ctx.db.delete(Post).where(eq(Post.id, input))
+  // }),
 } satisfies TRPCRouterRecord;

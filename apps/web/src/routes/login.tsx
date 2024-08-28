@@ -1,33 +1,56 @@
+import { Button } from "@acme/ui/button";
+import { ReloadIcon } from "@radix-ui/react-icons";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-
+import z from "zod";
 import { trpc } from "../router";
 
+const fallback = "/dashboard" as const;
+
 export const Route = createFileRoute("/login")({
-  component: LoginPage,
+  validateSearch: z.object({
+    redirect: z.string().optional().catch(""),
+  }),
+  beforeLoad: async ({ context, search }) => {
+    const session = await context.trpcQueryUtils.auth.getSession.ensureData();
+
+    if (session.session !== null) {
+      throw redirect({ to: search.redirect || fallback });
+    }
+  },
+  component: Login,
 });
 
-export function LoginPage() {
-  //   const { data } = trpc.auth.getSecretMessage.useQuery();
-  const githubLoginMutation = trpc.auth.githubLogin.useMutation();
+function Login() {
+  const search = Route.useSearch();
+  const loginMutation = trpc.auth.githubLogin.useMutation({
+    onSuccess: (data) => {
+      window.location.href = data.url;
+    },
+    onError: (error) => {
+      console.error("Login error:", error);
+    },
+  });
 
-  const initiateGithubLogin = async () => {
-    try {
-      const { url } = await githubLoginMutation.mutateAsync();
-      //   throw redirect({
-      //     to: url,
-      //   });
-      window.location.href = url; // Redirect to GitHub
-    } catch (error) {
-      console.error("Failed to initiate GitHub login", error);
-    }
-  };
+  const isLoading = loginMutation.isPending || loginMutation.isSuccess;
 
   return (
-    <div>
-      <h2>Login</h2>
-      {/* <h3>Secret message: {data}</h3> */}
-      {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
-      <button onClick={initiateGithubLogin}>Sign in with GitHub</button>
+    <div className="p-2 grid gap-2 place-items-center">
+      <h3 className="text-xl">Login page</h3>
+      {search.redirect ? (
+        <p className="text-red-500">You need to login to access this page.</p>
+      ) : (
+        <p>Login to see all the cool content in here.</p>
+      )}
+      <Button onClick={() => loginMutation.mutate()} disabled={isLoading}>
+        {isLoading ? (
+          <>
+            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+            Please wait
+          </>
+        ) : (
+          "Login with GitHub"
+        )}
+      </Button>
     </div>
   );
 }

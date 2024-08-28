@@ -1,7 +1,0 @@
-{
-  "extends": "@acme/tsconfig/base.json",
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "lib": ["DOM", "DOM.Iterable", "ES2022"]
-  }
-}

@@ -1,5 +1,6 @@
 import { lucia, validateRequest } from "@acme/auth";
 import { Hono } from "hono";
+import { getCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
 import type { Context } from "./lib/context";
@@ -7,7 +8,6 @@ import getSession from "./routes/auth/getSession";
 import logout from "./routes/auth/logout";
 import login from "./routes/login/github";
 import posts from "./routes/posts";
-import { getCookie } from "hono/cookie";
 
 const app = new Hono<Context>();
 

@@ -1,14 +1,14 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 
-import { protectedProcedure, publicProcedure } from "../trpc";
-import { TRPCError } from "@trpc/server";
 import { lucia } from "@acme/auth";
-import { z } from "zod";
 import { github } from "@acme/auth";
+import { TRPCError } from "@trpc/server";
 import { OAuth2RequestError, generateState } from "arctic";
+import { z } from "zod";
+import { protectedProcedure, publicProcedure } from "../trpc";
 
+import type { Session, User } from "lucia";
 import { parseCookies, serializeCookie } from "oslo/cookie";
-import type { User, Session } from "lucia";
 
 import { eq } from "@acme/db";
 import { accounts, profiles, users } from "@acme/db/schema";
@@ -39,6 +39,26 @@ export const authRouter = {
   }),
   getSecretMessage: protectedProcedure.query(() => {
     return "you can see this secret message!";
+  }),
+  logout: protectedProcedure.mutation(async ({ ctx }) => {
+    if (ctx.honoContext) {
+      const auth = ctx.honoContext.get("auth");
+      if (!auth.session) {
+        return {
+          success: true,
+        };
+      }
+      await lucia.invalidateSession(auth.session.id);
+      ctx.honoContext.header(
+        "Set-Cookie",
+        lucia.createBlankSessionCookie().serialize(),
+        {
+          append: true,
+        },
+      );
+    }
+
+    return { success: true };
   }),
   githubLogin: publicProcedure.mutation(async ({ ctx }) => {
     const state = generateState();

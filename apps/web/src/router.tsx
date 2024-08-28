@@ -1,9 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
-import { loggerLink, httpBatchLink } from "@trpc/client";
+import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCQueryUtils, createTRPCReact } from "@trpc/react-query";
 import SuperJSON from "superjson";
 
+import { env } from "../src/env/client";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 
@@ -11,6 +12,8 @@ import type { AppRouter } from "@acme/api";
 import { Spinner } from "./components/Spinner";
 
 // import { env } from "./env/server";
+
+const API_URL = env.VITE_API_URL;
 
 export const queryClient = new QueryClient();
 
@@ -20,12 +23,12 @@ export const trpcClient = trpc.createClient({
   links: [
     loggerLink({
       enabled: (op) =>
-        process.env.NODE_ENV === "development" ||
+        import.meta.env.MODE === "development" ||
         (op.direction === "down" && op.result instanceof Error),
     }),
     httpBatchLink({
       transformer: SuperJSON,
-      url: "http://localhost:3000/trpc",
+      url: `${API_URL}/trpc`,
       fetch(url, options) {
         return fetch(url, {
           ...options,

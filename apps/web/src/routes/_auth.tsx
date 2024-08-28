@@ -1,25 +1,67 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
-import { trpc } from "../router";
-import { LoginPage } from "./login"; // Import the LoginPage component
+import { Button } from "@acme/ui/button";
+import {
+  Outlet,
+  createFileRoute,
+  redirect,
+  useRouter,
+} from "@tanstack/react-router";
+// import { Login } from "../components/Login";
+import { trpc, trpcQueryUtils } from "../router";
 
 export const Route = createFileRoute("/_auth")({
-  component: AuthenticatedLayout,
-  loader: async ({ context: { trpcQueryUtils } }) => {
-    await trpcQueryUtils.auth.getSession.ensureData();
-    return;
+  beforeLoad: async ({ location, context }) => {
+    const session = await context.trpcQueryUtils.auth.getSession.ensureData();
+    console.log("session", session.session);
+    if (session.session === null) {
+      throw redirect({
+        to: "/login",
+        search: {
+          redirect: location.href,
+        },
+      });
+    }
+    // Optionally, you can return the session data if needed in the component
   },
+
+  component: AuthenticatedLayout,
 });
 
 function AuthenticatedLayout() {
-  const { data: session, isLoading } = trpc.auth.getSession.useQuery();
+  const router = useRouter();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  //   const { data: authData, isLoading } = trpc.auth.getSession.useQuery();
 
-  if (!session?.user) {
-    return <LoginPage />;
-  }
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      // Optionally, you can invalidate and refetch the session query here
+      trpcQueryUtils.auth.getSession.invalidate();
+      router.navigate({ to: "/" });
+    },
+    onError: (error) => {
+      console.error("Logout error:", error);
+      // Handle error (e.g., show an error message to the user)
+    },
+  });
 
-  return <Outlet />;
+  //   if (isLoading) {
+  //     return <div>Loading...</div>;
+  //   }
+
+  //   if (!authData || !authData.user) {
+  //     return <Login />;
+  //   }
+
+  return (
+    <div>
+      <div>
+        <Button
+          onClick={() => logoutMutation.mutate()}
+          disabled={logoutMutation.isPending}
+        >
+          {logoutMutation.isPending ? "Logging out..." : "Logout"}
+        </Button>
+      </div>
+      <Outlet />
+    </div>
+  );
 }

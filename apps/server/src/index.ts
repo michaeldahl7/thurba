@@ -1,15 +1,15 @@
 import { serve } from "@hono/node-server";
 import { getCookie, setCookie } from "hono/cookie";
-import { validateRequest } from "@acme/auth";
+
 import { lucia } from "@acme/auth";
-import { Hono } from "hono";
 import { github } from "@acme/auth"; //validateRequest,
-import { setSession } from "@acme/auth/sessions";
+import { Hono } from "hono";
 
 import { getAccountByGithubId } from "../data-access/accounts";
 
 import { OAuth2RequestError, generateState } from "arctic";
 import { createGithubUserUseCase } from "../use-cases/users";
+import { env } from "../env";
 
 export interface GitHubUser {
   id: string;
@@ -26,8 +26,8 @@ interface Email {
 }
 
 import { appRouter, createTRPCContext } from "@acme/api";
+import type { AuthResponse, Session, User } from "@acme/auth";
 import { trpcServer } from "@hono/trpc-server";
-import type { User, Session, AuthResponse } from "@acme/auth";
 import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
 
@@ -40,7 +40,7 @@ export interface Context extends Env {
     auth: AuthResponse;
   };
 }
-const FRONTEND_URL = "http://localhost:5173";
+const FRONTEND_URL = env.FRONTEND_URL;
 
 const app = new Hono<Context>();
 
@@ -53,38 +53,33 @@ app.use(
 app.use(csrf());
 
 app.use("*", async (c, next) => {
-  const sessionId = getCookie(c, lucia.sessionCookieName) ?? null;
-
   let authResponse: AuthResponse;
 
+  const sessionId = getCookie(c, lucia.sessionCookieName) ?? null;
   if (!sessionId) {
-    console.log("sessionId", sessionId);
     authResponse = { user: null, session: null };
-  } else {
-    const { user, session } = await validateRequest(sessionId);
-    console.log("user", user);
-    console.log("session", session);
-    if (!session) {
-      authResponse = { user: null, session: null };
-      c.header("Set-Cookie", lucia.createBlankSessionCookie().serialize(), {
-        append: true,
-      });
-    } else {
-      authResponse = { user, session };
-      if (session.fresh) {
-        c.header(
-          "Set-Cookie",
-          lucia.createSessionCookie(session.id).serialize(),
-          {
-            append: true,
-          },
-        );
-      }
-    }
+    c.set("auth", authResponse);
+    return next();
   }
-  console.log("authResponse:", authResponse);
+  const result = await lucia.validateSession(sessionId);
+  if (result.session?.fresh) {
+    // use `header()` instead of `setCookie()` to avoid TS errors
+    c.header(
+      "Set-Cookie",
+      lucia.createSessionCookie(result.session.id).serialize(),
+      {
+        append: true,
+      },
+    );
+  }
+  if (!result.session) {
+    c.header("Set-Cookie", lucia.createBlankSessionCookie().serialize(), {
+      append: true,
+    });
+  }
+  authResponse = result;
   c.set("auth", authResponse);
-  await next();
+  return next();
 });
 
 app.use(
@@ -93,7 +88,7 @@ app.use(
     router: appRouter,
     createContext: async (opts, honoContext) => {
       const auth = honoContext.get("auth") as AuthResponse;
-      console.log("auth:", auth);
+      console.log("auth in create context", auth);
       return await createTRPCContext({
         honoContext,
         session: auth,
@@ -105,22 +100,6 @@ app.use(
   }),
 );
 
-// app
-//   .get("/getSession", async (c) => {
-//     const user = c.get("user");
-//     const session = c.get("session");
-//     return c.json({ user, session });
-//   })
-//   .get("/protected", async (c) => {
-//     const user = c.get("user");
-//     if (!user) {
-//       return c.json({ error: "Authentication required" }, 401);
-//     }
-//     return c.json({ user });
-//   });
-app.get("/", async (c) => {
-  return c.text("Hello Hono!");
-});
 app.get("/login/github", async (c) => {
   const state = generateState();
   const url = await github.createAuthorizationURL(state);
@@ -157,7 +136,7 @@ app.get("/github/callback", async (c) => {
         { append: true },
       );
 
-      return c.redirect(`${FRONTEND_URL}/auth-callback?success=true`);
+      return c.redirect(`${FRONTEND_URL}`);
     }
     if (!githubUser.email) {
       const githubUserEmailResponse = await fetch(
@@ -180,24 +159,17 @@ app.get("/github/callback", async (c) => {
     c.header("Set-Cookie", lucia.createSessionCookie(session.id).serialize(), {
       append: true,
     });
-    return c.redirect(`http://localhost:3000/?success=true`);
+    return c.redirect(`${FRONTEND_URL}`);
   } catch (e) {
-    console.error("GitHub OAuth callback error:", e);
+    if (
+      e instanceof OAuth2RequestError &&
+      e.message === "bad_verification_code"
+    ) {
+      // invalid code
+      return c.body(null, 400);
+    }
+    return c.body(null, 500);
     // Redirect to frontend with an error parameter
-    return c.redirect(`http://localhost:3000/?error=authentication_failed`);
-
-    // if (e instanceof OAuth2RequestError) {
-    //   if (e.message === "bad_verification_code") {
-    //     return c.body("Invalid authorization code", 400);
-    //   }
-    //   return c.body(`OAuth2 error: ${e.message}`, 400);
-    // }
-
-    // if (e instanceof Error) {
-    //   return c.body(`Internal server error: ${e.message}`, 500);
-    // }
-
-    // return c.body("An unexpected error occurred", 500);
   }
 });
 
@@ -205,15 +177,6 @@ function getPrimaryEmail(emails: Email[]): string {
   const primaryEmail = emails.find((email) => email.primary);
   return primaryEmail!.email;
 }
-// app.get("/protected", async (c) => {
-//   const user = c.get("user");
-//   if (!user) {
-//     return c.json({ error: "Authentication required" }, 401);
-//   }
-//   return c.json({ user });
-// });
-
-// Add this new route for checking authentication status
 
 // const routes = app
 //   .route("/login", login)

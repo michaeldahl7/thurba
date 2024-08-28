@@ -1,3 +1,5 @@
+import { lucia } from "@acme/auth";
+import type { Session, User } from "@acme/auth";
 /**
  * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
  * 1. You want to modify request context (see Part 1)
@@ -7,14 +9,12 @@
  * The pieces you will need to use are documented accordingly near the end
  */
 import { TRPCError, initTRPC } from "@trpc/server";
+import type { Context as HonoContext } from "hono";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { lucia } from "@acme/auth"
-import type { Context as HonoContext } from 'hono';
-import type { User, Session} from "@acme/auth"
 
 import type { AuthResponse } from "@acme/auth";
-import { getCookie } from 'hono/cookie';
+import { getCookie } from "hono/cookie";
 
 import { database as db } from "@acme/db/client";
 
@@ -32,14 +32,14 @@ import { database as db } from "@acme/db/client";
  */
 export const createTRPCContext = async (opts: {
   honoContext: HonoContext;
-  session: AuthResponse
+  session: AuthResponse;
 }) => {
-
   const session = opts.session;
   const honoContext = opts.honoContext;
 
-  const source = opts.honoContext.req.raw.headers.get("x-trpc-source") ?? "unknown";
-  console.log(">>> tRPC Request from", source, "by", session?.user)
+  const source =
+    opts.honoContext.req.raw.headers.get("x-trpc-source") ?? "unknown";
+  console.log(">>> tRPC Request from", source, "by", session?.user);
 
   return {
     honoContext,
@@ -93,11 +93,12 @@ export const createTRPCRouter = t.router;
 const timingMiddleware = t.middleware(async ({ next, path }) => {
   const start = Date.now();
 
-  if (t._config.isDev) {
-    // artificial delay in dev 100-500ms
-    const waitMs = Math.floor(Math.random() * 400) + 100;
-    await new Promise((resolve) => setTimeout(resolve, waitMs));
-  }
+  //removing delay for dev speed
+  //   if (t._config.isDev) {
+  //     // artificial delay in dev 100-500ms
+  //     const waitMs = Math.floor(Math.random() * 400) + 100;
+  //     await new Promise((resolve) => setTimeout(resolve, waitMs));
+  //   }
 
   const result = await next();
 
@@ -125,9 +126,9 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure
-  .use(timingMiddleware)
+  //   .use(timingMiddleware)
   .use(({ ctx, next }) => {
-    if (ctx.session.user === null || ctx.session.session === null)  {
+    if (ctx.session.user === null || ctx.session.session === null) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
