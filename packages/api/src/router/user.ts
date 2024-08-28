@@ -9,12 +9,12 @@ const userInputSchema = z.object({
   id: z.number(),
 });
 
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { protectedProcedure } from "../trpc";
 
 export const userRouter = {
   profile: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.users.findFirst({
-      where: eq(users.id, ctx.session.user.id),
+      where: eq(users.id, ctx.auth.user.id),
     });
   }),
   updateProfile: protectedProcedure
@@ -23,17 +23,17 @@ export const userRouter = {
       return ctx.db
         .update(users)
         .set(input)
-        .where(eq(users.id, ctx.session.user.id));
+        .where(eq(users.id, ctx.auth.user.id));
     }),
 
   sessions: protectedProcedure.query(async ({ ctx }) => {
-    return lucia.getUserSessions(ctx.session.user.id);
+    return lucia.getUserSessions(ctx.auth.user.id);
   }),
 
   deleteSession: protectedProcedure
     .input(z.object({ sessionId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const userSessions = await lucia.getUserSessions(ctx.session.user.id);
+      const userSessions = await lucia.getUserSessions(ctx.auth.user.id);
 
       if (userSessions.find((ele) => ele.id === input.sessionId)) {
         return await lucia.invalidateSession(input.sessionId);

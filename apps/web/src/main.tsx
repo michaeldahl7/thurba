@@ -1,7 +1,8 @@
 import { RouterProvider } from "@tanstack/react-router";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./globals.css";
+import "./styles/globals.css";
+import "./styles/fonts.css";
 
 import { createRouter } from "./router";
 
@@ -13,7 +14,9 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>
-      <RouterProvider router={router} />
+      <div className="font-sans">
+        <RouterProvider router={router} />
+      </div>
     </React.StrictMode>,
   );
 }

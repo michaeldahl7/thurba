@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 import { accounts, groups, profiles, users } from "../src/schema";
-import { database, pg } from "./index_weird";
+import { database, pg } from "../src/client";
 
 async function main() {
   const [user] = await database

@@ -11,8 +11,6 @@ import { routeTree } from "./routeTree.gen";
 import type { AppRouter } from "@acme/api";
 import { Spinner } from "./components/Spinner";
 
-// import { env } from "./env/server";
-
 const API_URL = env.VITE_API_URL;
 
 export const queryClient = new QueryClient();

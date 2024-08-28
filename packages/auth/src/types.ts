@@ -19,3 +19,10 @@ export type MemberInfo = {
   image: string | null;
   role: Role;
 };
+
+export interface GitHubUser {
+  id: string;
+  login: string;
+  avatar_url: string;
+  email: string;
+}

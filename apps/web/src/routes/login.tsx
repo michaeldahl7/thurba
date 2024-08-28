@@ -11,7 +11,7 @@ export const Route = createFileRoute("/login")({
     redirect: z.string().optional().catch(""),
   }),
   beforeLoad: async ({ context, search }) => {
-    const session = await context.trpcQueryUtils.auth.getSession.ensureData();
+    const session = await context.trpcQueryUtils.auth.getAuth.ensureData();
 
     if (session.session !== null) {
       throw redirect({ to: search.redirect || fallback });

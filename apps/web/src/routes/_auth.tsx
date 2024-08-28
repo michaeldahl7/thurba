@@ -5,12 +5,12 @@ import {
   redirect,
   useRouter,
 } from "@tanstack/react-router";
-// import { Login } from "../components/Login";
+
 import { trpc, trpcQueryUtils } from "../router";
 
 export const Route = createFileRoute("/_auth")({
   beforeLoad: async ({ location, context }) => {
-    const session = await context.trpcQueryUtils.auth.getSession.ensureData();
+    const session = await context.trpcQueryUtils.auth.getAuth.ensureData();
     console.log("session", session.session);
     if (session.session === null) {
       throw redirect({
@@ -34,7 +34,7 @@ function AuthenticatedLayout() {
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       // Optionally, you can invalidate and refetch the session query here
-      trpcQueryUtils.auth.getSession.invalidate();
+      trpcQueryUtils.auth.getAuth.invalidate();
       router.navigate({ to: "/" });
     },
     onError: (error) => {

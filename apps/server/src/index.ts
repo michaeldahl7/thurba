@@ -1,17 +1,24 @@
 import { serve } from "@hono/node-server";
 import { getCookie, setCookie } from "hono/cookie";
 
-import { lucia } from "@acme/auth";
-import { github } from "@acme/auth"; //validateRequest,
+import { github, lucia } from "@acme/auth";
+import type { AuthContext } from "@acme/auth";
 import { Hono } from "hono";
 
 import { getAccountByGithubId } from "../data-access/accounts";
 
-import { OAuth2RequestError, generateState } from "arctic";
-import { createGithubUserUseCase } from "../use-cases/users";
+import { appRouter, createTRPCContext } from "@acme/api";
+import { OAuth2RequestError } from "arctic";
 import { env } from "../env";
+import { createGithubUserUseCase } from "../use-cases/users";
 
-export interface GitHubUser {
+import { trpcServer } from "@hono/trpc-server";
+import { cors } from "hono/cors";
+import { csrf } from "hono/csrf";
+
+import type { Env } from "hono";
+
+interface GitHubUser {
   id: string;
   login: string;
   avatar_url: string;
@@ -25,35 +32,24 @@ interface Email {
   visibility: string | null;
 }
 
-import { appRouter, createTRPCContext } from "@acme/api";
-import type { AuthResponse, Session, User } from "@acme/auth";
-import { trpcServer } from "@hono/trpc-server";
-import { cors } from "hono/cors";
-import { csrf } from "hono/csrf";
-
-import type { Env } from "hono";
-
 export interface Context extends Env {
   Variables: {
-    user: User | null;
-    session: Session | null;
-    auth: AuthResponse;
+    auth: AuthContext;
   };
 }
-const FRONTEND_URL = env.FRONTEND_URL;
 
 const app = new Hono<Context>();
 
 app.use(
   cors({
-    origin: FRONTEND_URL, // Your frontend URL
+    origin: env.FRONTEND_URL,
     credentials: true,
   }),
 );
 app.use(csrf());
 
 app.use("*", async (c, next) => {
-  let authResponse: AuthResponse;
+  let authResponse: AuthContext;
 
   const sessionId = getCookie(c, lucia.sessionCookieName) ?? null;
   if (!sessionId) {
@@ -87,11 +83,11 @@ app.use(
   trpcServer({
     router: appRouter,
     createContext: async (opts, honoContext) => {
-      const auth = honoContext.get("auth") as AuthResponse;
+      const auth = honoContext.get("auth") as AuthContext;
       console.log("auth in create context", auth);
       return await createTRPCContext({
         honoContext,
-        session: auth,
+        auth: auth,
       });
     },
     onError({ error, path }) {
@@ -100,18 +96,18 @@ app.use(
   }),
 );
 
-app.get("/login/github", async (c) => {
-  const state = generateState();
-  const url = await github.createAuthorizationURL(state);
-  setCookie(c, "github_oauth_state", state, {
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    maxAge: 60 * 10,
-    sameSite: "Lax",
-  });
-  return c.redirect(url.toString());
-});
+// app.get("/login/github", async (c) => {
+//   const state = generateState();
+//   const url = await github.createAuthorizationURL(state);
+//   setCookie(c, "github_oauth_state", state, {
+//     path: "/",
+//     secure: process.env.NODE_ENV === "production",
+//     httpOnly: true,
+//     maxAge: 60 * 10,
+//     sameSite: "Lax",
+//   });
+//   return c.redirect(url.toString());
+// });
 app.get("/github/callback", async (c) => {
   const code = c.req.query("code")?.toString() ?? null;
   const state = c.req.query("state")?.toString() ?? null;
@@ -136,7 +132,7 @@ app.get("/github/callback", async (c) => {
         { append: true },
       );
 
-      return c.redirect(`${FRONTEND_URL}`);
+      return c.redirect(`${env.FRONTEND_URL}`);
     }
     if (!githubUser.email) {
       const githubUserEmailResponse = await fetch(
@@ -159,7 +155,7 @@ app.get("/github/callback", async (c) => {
     c.header("Set-Cookie", lucia.createSessionCookie(session.id).serialize(), {
       append: true,
     });
-    return c.redirect(`${FRONTEND_URL}`);
+    return c.redirect(`${env.FRONTEND_URL}`);
   } catch (e) {
     if (
       e instanceof OAuth2RequestError &&
@@ -178,14 +174,4 @@ function getPrimaryEmail(emails: Email[]): string {
   return primaryEmail!.email;
 }
 
-// const routes = app
-//   .route("/login", login)
-//   .route("/logout", logout)
-//   .route("/getSession", getSession)
-//   .route("/posts", posts);
-
-// export type AppType = typeof routes;
-
 serve(app);
-
-export { app };

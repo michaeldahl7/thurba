@@ -14,7 +14,7 @@ export const adapter = new DrizzlePostgreSQLAdapter(
   users,
 );
 
-export type AuthResponse =
+export type AuthContext =
   | { user: User; session: Session }
   | { user: null; session: null };
 
@@ -40,26 +40,6 @@ declare module "lucia" {
     UserId: CustomUserId;
   }
 }
-
-export const validateRequest = async (
-  sessionId: string | null,
-): Promise<
-  { user: User; session: Session } | { user: null; session: null }
-> => {
-  if (!sessionId) {
-    return {
-      user: null,
-      session: null,
-    };
-  }
-
-  const result = await lucia.validateSession(sessionId);
-  return result;
-};
-
-export const invalidateSessionToken = async (sessionId: string) => {
-  await lucia.invalidateSession(sessionId);
-};
 
 export const github = new GitHub(
   env.GITHUB_CLIENT_ID,

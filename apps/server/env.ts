@@ -1,9 +1,6 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
-// import { env as authEnv } from "@acme/auth/env";
-// import { env as dbEnv } from "@acme/db/env";
-
 export const env = createEnv({
   shared: {
     NODE_ENV: z

@@ -1,5 +1,3 @@
-import { lucia } from "@acme/auth";
-import type { Session, User } from "@acme/auth";
 /**
  * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
  * 1. You want to modify request context (see Part 1)
@@ -8,13 +6,12 @@ import type { Session, User } from "@acme/auth";
  * tl;dr - this is where all the tRPC server stuff is created and plugged in.
  * The pieces you will need to use are documented accordingly near the end
  */
+import type { AuthContext, Session, User } from "@acme/auth";
+
 import { TRPCError, initTRPC } from "@trpc/server";
 import type { Context as HonoContext } from "hono";
 import superjson from "superjson";
 import { ZodError } from "zod";
-
-import type { AuthResponse } from "@acme/auth";
-import { getCookie } from "hono/cookie";
 
 import { database as db } from "@acme/db/client";
 
@@ -32,18 +29,18 @@ import { database as db } from "@acme/db/client";
  */
 export const createTRPCContext = async (opts: {
   honoContext: HonoContext;
-  session: AuthResponse;
+  auth: AuthContext;
 }) => {
-  const session = opts.session;
+  const auth = opts.auth;
   const honoContext = opts.honoContext;
 
   const source =
     opts.honoContext.req.raw.headers.get("x-trpc-source") ?? "unknown";
-  console.log(">>> tRPC Request from", source, "by", session?.user);
+  console.log(">>> tRPC Request from", source, "by", auth?.user);
 
   return {
     honoContext,
-    session,
+    auth,
     db,
   };
 };
@@ -126,16 +123,16 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure
-  //   .use(timingMiddleware)
+  .use(timingMiddleware)
   .use(({ ctx, next }) => {
-    if (ctx.session.user === null || ctx.session.session === null) {
+    if (!ctx.auth.user || !ctx.auth.session) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
     return next({
       ctx: {
         ...ctx,
-        session: ctx.session as { user: User; session: Session },
+        auth: ctx.auth as { user: User; session: Session },
       },
     });
   });
