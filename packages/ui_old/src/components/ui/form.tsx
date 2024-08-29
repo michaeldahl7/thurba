@@ -18,7 +18,7 @@ import {
 } from "react-hook-form";
 import type { ZodType, ZodTypeDef } from "zod";
 
-import { cn } from "@acme/ui";
+import { cn } from "@ui/lib/utils";
 
 import { Label } from "./label";
 

@@ -4,7 +4,7 @@ import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCQueryUtils, createTRPCReact } from "@trpc/react-query";
 import SuperJSON from "superjson";
 
-import { env } from "../src/env/client";
+import { env } from "../env/client";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 

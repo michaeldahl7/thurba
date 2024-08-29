@@ -11,7 +11,7 @@ import type { UserId as CustomUserId } from "./types";
 export const adapter = new DrizzlePostgreSQLAdapter(
   database,
   sessions as any,
-  users,
+  users as any,
 );
 
 export type AuthContext =

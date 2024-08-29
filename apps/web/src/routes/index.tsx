@@ -1,4 +1,4 @@
-import { Button } from "@acme/ui/button";
+import { Button } from "@acme/ui/components/ui/button";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -12,6 +12,9 @@ function HomeComponent() {
 
       <ol className="list-disc list-inside px-2">
         <li>
+          {/* <Link to="/login" className="text-blue-500 hover:opacity-75">
+            Go to the public login page.
+          </Link> */}
           <Button asChild>
             <Link to="/login" className="text-blue-500 hover:opacity-75">
               Go to the public login page.
@@ -19,11 +22,14 @@ function HomeComponent() {
           </Button>
         </li>
         <li>
-          <Button asChild>
+          <Link to="/dashboard" className="text-blue-500 hover:opacity-75">
+            Go to the auth-only dashboard page.
+          </Link>
+          {/* <Button asChild>
             <Link to="/dashboard" className="text-blue-500 hover:opacity-75">
               Go to the auth-only dashboard page.
             </Link>
-          </Button>
+          </Button> */}
         </li>
       </ol>
     </div>

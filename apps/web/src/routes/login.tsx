@@ -1,4 +1,4 @@
-import { Button } from "@acme/ui/button";
+import { Button } from "@acme/ui/components/ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import z from "zod";

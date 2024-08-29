@@ -6,26 +6,26 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "default": "./src/index.ts"
     },
     "./client": {
       "types": "./dist/client.d.ts",
-      "default": "./dist/client.js"
+      "default": "./src/client.ts"
     },
     "./schema": {
       "types": "./dist/schema.d.ts",
-      "default": "./dist/schema.js"
+      "default": "./src/schema.ts"
     },
     "./env": {
       "types": "./dist/env.d.ts",
-      "default": "./dist/env.js"
+      "default": "./src/env.ts"
     }
   },
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc",
-    "clean": "rm -rf .turbo dist node_modules",
     "push": "pnpm with-env drizzle-kit push",
     "db:gen": "pnpm with-env drizzle-kit generate",
     "db:migrate": "pnpm with-env drizzle-kit migrate",
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.10.1",
-    "drizzle-orm": "^0.31.4",
+    "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",
     "postgres": "^3.4.4",
     "zod": "catalog:"

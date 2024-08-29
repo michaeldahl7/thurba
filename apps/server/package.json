@@ -1,6 +1,7 @@
 {
   "name": "@acme/server",
   "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "pnpm with-env tsx watch src/index.ts",
     "with-env": "dotenv -e ../../.env --"
   },
@@ -11,7 +12,10 @@
     "@hono/node-server": "^1.12.0",
     "@hono/trpc-server": "^0.3.2",
     "@hono/zod-validator": "^0.2.2",
-    "hono": "^4.5.3"
+	"arctic": "^1.9.2",
+    "hono": "^4.5.3",
+	"@t3-oss/env-core": "^0.10.1",
+	"zod": "catalog:"
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",

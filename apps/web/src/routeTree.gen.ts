@@ -10,66 +10,66 @@
 
 // Import Routes
 
-import { Route as rootRoute } from "./routes/__root";
-import { Route as AuthImport } from "./routes/_auth";
-import { Route as AuthDashboardImport } from "./routes/_auth.dashboard";
-import { Route as IndexImport } from "./routes/index";
-import { Route as LoginImport } from "./routes/login";
+import { Route as rootRoute } from './routes/__root'
+import { Route as LoginImport } from './routes/login'
+import { Route as AuthImport } from './routes/_auth'
+import { Route as IndexImport } from './routes/index'
+import { Route as AuthDashboardImport } from './routes/_auth.dashboard'
 
 // Create/Update Routes
 
 const LoginRoute = LoginImport.update({
-  path: "/login",
+  path: '/login',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const AuthRoute = AuthImport.update({
-  id: "/_auth",
+  id: '/_auth',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const IndexRoute = IndexImport.update({
-  path: "/",
+  path: '/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const AuthDashboardRoute = AuthDashboardImport.update({
-  path: "/dashboard",
+  path: '/dashboard',
   getParentRoute: () => AuthRoute,
-} as any);
+} as any)
 
 // Populate the FileRoutesByPath interface
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/_auth": {
-      id: "/_auth";
-      path: "";
-      fullPath: "";
-      preLoaderRoute: typeof AuthImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/login": {
-      id: "/login";
-      path: "/login";
-      fullPath: "/login";
-      preLoaderRoute: typeof LoginImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/_auth/dashboard": {
-      id: "/_auth/dashboard";
-      path: "/dashboard";
-      fullPath: "/dashboard";
-      preLoaderRoute: typeof AuthDashboardImport;
-      parentRoute: typeof AuthImport;
-    };
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/_auth/dashboard': {
+      id: '/_auth/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthDashboardImport
+      parentRoute: typeof AuthImport
+    }
   }
 }
 
@@ -79,7 +79,7 @@ export const routeTree = rootRoute.addChildren({
   IndexRoute,
   AuthRoute: AuthRoute.addChildren({ AuthDashboardRoute }),
   LoginRoute,
-});
+})
 
 /* prettier-ignore-end */
 

@@ -1,4 +1,4 @@
-import { Button } from "@acme/ui/button";
+import { Button } from "../../../../packages/ui_old/src/components";
 import {
   Outlet,
   createFileRoute,

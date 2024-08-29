@@ -6,21 +6,24 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "default": "./src/index.ts"
     }
   },
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf .turbo dist node_modules",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "hono": "^4.5.3",
     "@acme/db": "workspace:*",
     "@acme/auth": "workspace:*",
     "@acme/validators": "workspace:*",
     "@trpc/server": "catalog:",
+    "arctic": "1.9.2",
+    "oslo": "1.0.1",
     "superjson": "2.2.1",
     "zod": "catalog:"
   },

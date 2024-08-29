@@ -9,6 +9,7 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+import { pg } from "./client";
 
 export const createTable = pgTableCreator((name) => `thurba_${name}`);
 
@@ -16,14 +17,15 @@ export const roleEnum = pgEnum("role", ["member", "admin"]);
 export const accountTypeEnum = pgEnum("type", ["email", "google", "github"]);
 
 export const users = createTable("user", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
   email: text("email").unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
 });
 
+
 export const accounts = createTable("accounts", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+	userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   accountType: accountTypeEnum("accountType").notNull(),
@@ -34,25 +36,24 @@ export const accounts = createTable("accounts", {
 });
 
 export const magicLinks = createTable("magic_links", {
-  id: serial("id").primaryKey(),
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
   email: text("email").notNull().unique(),
   token: text("token"),
   tokenExpiresAt: timestamp("tokenExpiresAt", { mode: "date" }),
 });
 
 export const resetTokens = createTable("reset_tokens", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" })
-    .unique(),
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
+  .notNull()
+  .references(() => users.id, { onDelete: "cascade" }),
   token: text("token"),
   tokenExpiresAt: timestamp("tokenExpiresAt", { mode: "date" }),
 });
 
 export const verifyEmailTokens = createTable("verify_email_tokens", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" })
     .unique(),
@@ -61,8 +62,8 @@ export const verifyEmailTokens = createTable("verify_email_tokens", {
 });
 
 export const profiles = createTable("profile", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" })
     .unique(),
@@ -74,7 +75,7 @@ export const profiles = createTable("profile", {
 
 export const sessions = createTable("session", {
   id: text("id").primaryKey(),
-  userId: serial("userId")
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   expiresAt: timestamp("expires_at", {
@@ -84,8 +85,8 @@ export const sessions = createTable("session", {
 });
 
 export const subscriptions = createTable("subscriptions", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" })
     .unique(),
@@ -96,11 +97,11 @@ export const subscriptions = createTable("subscriptions", {
 });
 
 export const following = createTable("following", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  foreignUserId: serial("foreignUserId")
+  foreignUserId: integer("foreignUserId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 });
@@ -112,13 +113,13 @@ export const following = createTable("following", {
  * third party provider shutting down or dropping your data.
  */
 export const newsletters = createTable("newsletter", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
   email: text("email").notNull().unique(),
 });
 
 export const groups = createTable("group", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
@@ -133,27 +134,27 @@ export const groups = createTable("group", {
 });
 
 export const memberships = createTable("membership", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  groupId: serial("groupId")
+  groupId: integer("groupId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => groups.id, { onDelete: "cascade" }),
   role: roleEnum("role").default("member"),
 });
 
 export const invites = createTable("invites", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
   token: text("token").notNull().default(sql`gen_random_uuid()`).unique(),
-  groupId: serial("groupId")
+  groupId: integer("groupId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => groups.id, { onDelete: "cascade" }),
 });
 
 export const events = createTable("events", {
-  id: serial("id").primaryKey(),
-  groupId: serial("groupId")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  groupId: integer("groupId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => groups.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
@@ -163,11 +164,11 @@ export const events = createTable("events", {
 });
 
 export const notifications = createTable("notifications", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  groupId: serial("groupId")
+  groupId: integer("groupId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => groups.id, { onDelete: "cascade" }),
   postId: integer("postId"),
@@ -178,11 +179,11 @@ export const notifications = createTable("notifications", {
 });
 
 export const posts = createTable("posts", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  groupId: serial("groupId")
+  groupId: integer("groupId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => groups.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
@@ -191,14 +192,14 @@ export const posts = createTable("posts", {
 });
 
 export const reply = createTable("replies", {
-  id: serial("id").primaryKey(),
-  userId: serial("userId")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity({ startWith: 1000, }),
+  userId: integer("userId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  postId: serial("postId")
+  postId: integer("postId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => posts.id, { onDelete: "cascade" }),
-  groupId: serial("groupId")
+  groupId: integer("postId").generatedAlwaysAsIdentity({ startWith: 1000, })
     .notNull()
     .references(() => groups.id, { onDelete: "cascade" }),
   message: text("message").notNull(),

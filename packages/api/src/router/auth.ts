@@ -4,7 +4,7 @@ import { generateState } from "arctic";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
-import type { Session, User } from "lucia";
+// import type { Session, User } from "lucia";
 import { serializeCookie } from "oslo/cookie";
 // import { z } from "zod";
 // import { eq } from "@acme/db";
@@ -53,4 +53,19 @@ export const authRouter = {
 
     return { url: url.toString() };
   }),
+  sessions: protectedProcedure.query(async ({ ctx }) => {
+    return lucia.getUserSessions(ctx.auth.user.id);
+  }),
+
+  //   deleteSession: protectedProcedure
+  //     .input(z.object({ sessionId: z.string() }))
+  //     .mutation(async ({ ctx, input }) => {
+  //       const userSessions = await lucia.getUserSessions(ctx.auth.user.id);
+
+  //       if (userSessions.find((ele) => ele.id === input.sessionId)) {
+  //         return await lucia.invalidateSession(input.sessionId);
+  //       } else {
+  //         throw new TRPCError({ code: "BAD_REQUEST" });
+  //       }
+  //     }),
 } satisfies TRPCRouterRecord;

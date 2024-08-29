@@ -5,21 +5,22 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./env": "./env.ts",
-    "./sessions": "./src/sessions.ts"
+    "./env": "./env.ts"
   },
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf .turbo node_modules",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@acme/db": "workspace:*",
     "@lucia-auth/adapter-drizzle": "^1.0.7",
+	"@t3-oss/env-core": "^0.10.1",
     "arctic": "^1.9.2",
-    "lucia": "^3.2.0"
+    "lucia": "^3.2.0",
+	"zod": "catalog:"
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",

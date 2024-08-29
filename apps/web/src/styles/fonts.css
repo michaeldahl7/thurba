@@ -70,7 +70,7 @@
   @font-face {
 	font-family: "Geist";
 	src: url("/fonts/geist/Geist-Black.woff2") format("woff2"),
-	  url("/fonts/geist/Geist-BLack.woff") format("woff");
+	  url("/fonts/geist/Geist-Black.woff") format("woff");
 	font-weight: 800;
 	font-style: normal;
 	font-display: swap;
